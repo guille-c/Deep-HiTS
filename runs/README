@@ -1,0 +1,3 @@
+Tu run go into one of the directories and do:
+
+python2 ../../src/Deep-HiTS.py input.txt >deep-hits.out 2> deep-hits.err&

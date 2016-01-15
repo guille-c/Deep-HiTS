@@ -1,0 +1,10 @@
+[vars]
+path_to_chunks: /home/shared/Fields_12-2015/chunks_feat_50000/
+learning_rate: 0.1
+n_epochs: 50
+batch_size: 50
+N_valid = 100000
+N_test = 100000
+validate_every_batches = 2000
+n_rot: 1
+activation_function: tanh
