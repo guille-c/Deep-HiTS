@@ -37,6 +37,8 @@ from mlp import HiddenLayer
 from loadHITS import *
 from ChunkLoader import *
 
+from ConfigParser import ConfigParser
+
 def relu(x):
     return T.switch(x<0, 0, x)
     
@@ -117,10 +119,10 @@ class LeNetConvPoolLayer(object):
         self.params = [self.W, self.b]
 
 
-def evaluate_lenet5(learning_rate=0.1, n_epochs= 10000,
-                    nkerns=[20, 50], batch_size=500,
-                    N_valid = 100000, N_test = 100000,
-                    validate_every_batches = 100, n_rot = 3, activation = T.tanh):
+def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
+                     nkerns=[20, 50], batch_size=500,
+                     N_valid = 100000, N_test = 100000,
+                     validate_every_batches = 100, n_rot = 3, activation = T.tanh):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -144,7 +146,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs= 10000,
     # Creation of validation and test sets
     train_set_x, train_set_y = shared_dataset((np.ones((1, 441*im_chan)), np.ones(1)))
     
-    chunkLoader = ChunkLoader('/home/shared/Fields_12-2015/chunks_feat/chunks_validate/',
+    chunkLoader = ChunkLoader(data_path + '/chunks_validate/',
                               n_rot = n_rot)
 
     v_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
@@ -158,7 +160,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs= 10000,
     valid_set_x, valid_set_y = shared_dataset ([v_x, v_y])
 
 
-    chunkLoader = ChunkLoader('/home/shared/Fields_12-2015/chunks_feat/chunks_5000/',
+    chunkLoader = ChunkLoader(data_path + '/chunks_train/',
                               batch_size = batch_size, n_rot = n_rot)
     #valid_set_x, valid_set_y = datasets[1]
     #test_set_x, test_set_y   = datasets[2]
@@ -408,7 +410,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs= 10000,
                     #improve patience if loss improvement is good enough
                     if this_validation_loss < best_validation_loss *  \
                        improvement_threshold:
-                        patience = max(patience, min((iter * patience_increase, max_patience_increase)))
+                        patience = max(patience, min((iter * patience_increase, max_patience_increase + patience)))
                         print "patience = ", patience, improvement_threshold, iter * patience_increase
 
                     # save best validation score and iteration number
@@ -488,7 +490,7 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs= 10000,
 
 
     # Loading test data
-    chunkLoader = ChunkLoader('/home/shared/Fields_12-2015/chunks_feat/chunks_test/',
+    chunkLoader = ChunkLoader(data_path + '/chunks_test/',
                               n_rot = n_rot)
 
     SNRs = []
@@ -575,12 +577,28 @@ def evaluate_lenet5(learning_rate=0.1, n_epochs= 10000,
     #                 'test_err':test_errors.mean()}, f,  pickle.HIGHEST_PROTOCOL)
     
 if __name__ == '__main__':
-    evaluate_lenet5(learning_rate=0.1, n_epochs= 50,
-                    nkerns=[20, 50], batch_size=50,
-                    N_valid = 100000, N_test = 100000,
-                    #N_valid = 70000, N_test = 70000,
-                    validate_every_batches = 2000,
-                    n_rot = 1, activation = relu)
+    c = ConfigParser ()
+    c.read(sys.argv[1])
+    #print type(c.get("vars", "a"))
+    #print c.get("vars", "c")
+
+    if c.get("vars", "activation_function") == "tanh":
+        activation = T.tanh
+    elif c.get("vars", "activation_function") == "ReLU":
+        activation = relu
+        
+    evaluate_convnet(c.get("vars", "path_to_chunks"),
+                     learning_rate = float (c.get("vars", "learning_rate")),
+                     n_epochs = int (c.get("vars", "n_epochs")),
+                     nkerns=[20, 50],
+                     batch_size = int (c.get("vars", "batch_size")),
+                     N_valid = int (c.get("vars", "N_valid")),
+                     N_test = int (c.get("vars", "N_test")),
+                     #N_valid = 70000, N_test = 70000,
+                     validate_every_batches = int (c.get("vars",
+                                                         "validate_every_batches")),
+                     n_rot = int (c.get("vars", "n_rot")),
+                     activation = activation)
 
 
 def experiment(state, channel):
