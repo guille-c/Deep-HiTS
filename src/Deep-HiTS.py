@@ -119,7 +119,8 @@ class LeNetConvPoolLayer(object):
         self.params = [self.W, self.b]
 
 
-def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
+def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
+                     n_epochs= 10000,
                      nkerns=[20, 50], batch_size=500,
                      N_valid = 100000, N_test = 100000,
                      validate_every_batches = 100, n_rot = 3, activation = T.tanh):
@@ -264,6 +265,8 @@ def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
     # parameters, it would be tedious to manually create an update
     # rule for each model parameter. We thus create the updates list
     # by automatically looping over all (params[i], grads[i]) pairs.
+
+    learning_rate = theano.shared(np.array(base_lr, dtype=theano.config.floatX))
     updates = [
         (param_i, param_i - learning_rate * grad_i)
         for param_i, grad_i in zip(params, grads)
@@ -327,7 +330,7 @@ def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
     patience_increase = 2  # wait this much longer when a new best is
                            # found
     max_patience_increase = 100000
-    improvement_threshold = 0.999  # a relative improvement of this much is
+    improvement_threshold = 0.99  # a relative improvement of this much is
                                    # considered significant
     validation_frequency = min(validate_every_batches, patience / 2)
                                   # go through this many
@@ -387,7 +390,12 @@ def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
             if train_minibatch_error > 0.1:
                 print "--> train error = ", train_minibatch_error
                 print "--> ", chunkLoader.current_file, chunkLoader.batch_i, chunkLoader.files[chunkLoader.current_file]
-            
+
+	    # Adaptive Learning Rate
+	    if (iter+1) % stepsize == 0:
+		learning_rate.set_value(np.array(learning_rate.get_value()*gamma, dtype="float32"))
+		print "Learning rate: ", learning_rate.get_value()
+
 	    #VALIDATION
             if (iter + 1) % validation_frequency == 0:
                 print "iter ", iter, " validation"
@@ -410,7 +418,7 @@ def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
                     #improve patience if loss improvement is good enough
                     if this_validation_loss < best_validation_loss *  \
                        improvement_threshold:
-                        patience = max(patience, min((iter * patience_increase, max_patience_increase + patience)))
+                        patience = max(patience, min((iter * patience_increase, max_patience_increase + iter)))
                         print "patience = ", patience, improvement_threshold, iter * patience_increase
 
                     # save best validation score and iteration number
@@ -460,7 +468,7 @@ def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
                 print "patience <= iter", patience, iter
                 break
             
-            chunkLoader.done = False
+        chunkLoader.done = False
 
             #if iter>300:
             #    done_looping = True
@@ -588,7 +596,9 @@ if __name__ == '__main__':
         activation = relu
         
     evaluate_convnet(c.get("vars", "path_to_chunks"),
-                     learning_rate = float (c.get("vars", "learning_rate")),
+                     base_lr = float (c.get("vars", "base_lr")),
+		     stepsize = int (c.get("vars", "stepsize")),
+		     gamma = float (c.get("vars", "gamma")),
                      n_epochs = int (c.get("vars", "n_epochs")),
                      nkerns=[20, 50],
                      batch_size = int (c.get("vars", "batch_size")),
