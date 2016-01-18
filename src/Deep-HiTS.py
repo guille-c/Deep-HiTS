@@ -123,7 +123,8 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
                      n_epochs= 10000,
                      nkerns=[20, 50], batch_size=500,
                      N_valid = 100000, N_test = 100000,
-                     validate_every_batches = 100, n_rot = 3, activation = T.tanh):
+                     validate_every_batches = 100, n_rot = 3, activation = T.tanh,
+                     tiny_train = False):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -163,6 +164,21 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
 
     chunkLoader = ChunkLoader(data_path + '/chunks_train/',
                               batch_size = batch_size, n_rot = n_rot)
+
+    if tiny_train:
+        tr_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
+        tr_y = np.array([], dtype = "int32")
+        while (len(tr_y) < tiny_train):
+            tr_x1, tr_y1 = chunkLoader.getNext()
+            tr_x = np.vstack((tr_x, tr_x1))
+            tr_y = np.concatenate((tr_y, tr_y1))
+        
+        print "training set = ", len(tr_y)
+        train_set_x, train_set_y = shared_dataset ([tr_x, tr_y])
+
+        n_train_batches = train_set_x.get_value(borrow=True).shape[0]
+        n_train_batches /= batch_size
+
     #valid_set_x, valid_set_y = datasets[1]
     #test_set_x, test_set_y   = datasets[2]
     
@@ -363,28 +379,30 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
     while (epoch < n_epochs) and (not done_looping):
         epoch = epoch + 1
         #for minibatch_index in xrange(n_train_batches):
-        while not chunkLoader.done:
+        epoch_done = False
+        minibatch_index = 0
+        while not epoch_done:
             iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
             if iter % 100 == 0:
                 print 'training @ iter = ', iter
 
-            chunk_x, chunk_y = chunkLoader.getNext()
-            # bad chunk
-            #if (chunkLoader.current_file == 239 and
-            #    chunkLoader.batch_i == 4000 and
-            #    chunkLoader.files[chunkLoader.current_file] == "chunk_95_5000.pkl"):
-            #    continue
-            #print chunk_x.shape, chunk_y.shape
-            #chunk_y = chunk_y.reshape((len(chunk_y), 1))
-	    #for t_set_x, x_chunk in zip(train_set_x, chunk_x):
-	        #t_set_x.set_value(x_chunk)
-            train_set_x.set_value(chunk_x)
-	    train_set_y.set_value(chunk_y)
-            #cost_ij = train_model(minibatch_index)
-            cost_ij = train_model(0)
+            if tiny_train:
+                iter = (epoch - 1) * n_train_batches + minibatch_index
+                cost_ij = train_model(minibatch_index)
+                train_minibatch_error = test_model_train(minibatch_index)
+                minibatch_index += 1
+                epoch_done = (minibatch_index == n_train_batches)
+            else:
+                iter += 1
+                chunk_x, chunk_y = chunkLoader.getNext()
+                train_set_x.set_value(chunk_x)
+	        train_set_y.set_value(chunk_y)
+                cost_ij = train_model(0)
+                train_minibatch_error = test_model_train(0)
+                epoch_done = chunkLoader.done
+
             train_loss_history.append(cost_ij.tolist())
-            train_minibatch_error = test_model_train(0)
-	    train_err_history.append(train_minibatch_error)
+            train_err_history.append(train_minibatch_error)
             iter_train_history.append(iter+1)
 
             if train_minibatch_error > 0.1:
@@ -492,6 +510,10 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
     del(valid_set_x)
     del(valid_set_y)
 
+    train_set_x.set_value([[]])
+    train_set_y.set_value([])
+    del(train_set_x)
+    del(train_set_y)
 
     # Loading test data
     chunkLoader = ChunkLoader(data_path + '/chunks_test/',
@@ -590,7 +612,13 @@ if __name__ == '__main__':
         activation = T.tanh
     elif c.get("vars", "activation_function") == "ReLU":
         activation = relu
-        
+
+    tiny_train = c.get("vars", "tiny_train")
+    if tiny_train == "False":
+        tiny_train = False
+    else:
+        tiny_train = int(tiny_train)
+
     evaluate_convnet(c.get("vars", "path_to_chunks"),
                      base_lr = float (c.get("vars", "base_lr")),
 		     stepsize = int (c.get("vars", "stepsize")),
@@ -604,7 +632,8 @@ if __name__ == '__main__':
                      validate_every_batches = int (c.get("vars",
                                                          "validate_every_batches")),
                      n_rot = int (c.get("vars", "n_rot")),
-                     activation = activation)
+                     activation = activation,
+    		     tiny_train = tiny_train)
 
 
 def experiment(state, channel):
