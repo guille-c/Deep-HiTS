@@ -410,7 +410,7 @@ def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
                     #improve patience if loss improvement is good enough
                     if this_validation_loss < best_validation_loss *  \
                        improvement_threshold:
-                        patience = max(patience, min((iter * patience_increase, max_patience_increase + patience)))
+                        patience = max(patience, min((iter * patience_increase, max_patience_increase + iter)))
                         print "patience = ", patience, improvement_threshold, iter * patience_increase
 
                     # save best validation score and iteration number
@@ -459,12 +459,8 @@ def evaluate_convnet(data_path, learning_rate=0.1, n_epochs= 10000,
                 done_looping = True
                 print "patience <= iter", patience, iter
                 break
-            
-            chunkLoader.done = False
 
-            #if iter>300:
-            #    done_looping = True
-            #    break
+        chunkLoader.done = False
 
     end_time = time.clock()
     print('Optimization complete.')
