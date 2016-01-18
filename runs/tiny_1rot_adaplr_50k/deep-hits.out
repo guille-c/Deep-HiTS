@@ -1,0 +1,797 @@
+Couldn't import dot_parser, loading of dot files will not be possible.
+validation set =  100000
+training set =  100000
+... building the model
+layer0_input =  (50, 8, 21, 21)
+layer0 =  (20, 8, 5, 5) (3, 3)
+maxpool_size1 =  5
+... training
+--> train error =  0.46
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.46
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.48
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.42
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.38
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.3
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.28
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.32
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.36
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.3
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.4
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.22
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.22
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.24
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.2
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.2
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.22
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.38
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.36
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.26
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.24
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.34
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.16
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.16
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.26
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.16
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.16
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.2
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.5
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.5
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.42
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.3
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.24
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.32
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.3
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.22
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.24
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.24
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.36
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.22
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.2
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  100
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.16
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.4
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  200
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.24
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.16
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  300
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  400
+training @ iter =  500
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  600
+training @ iter =  700
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.48
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.2
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  800
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  900
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  1000
+training @ iter =  1100
+training @ iter =  1200
+--> train error =  0.26
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.36
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  1300
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  1400
+training @ iter =  1500
+--> train error =  0.18
+-->  20 0 chunk_154_5000.pkl
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  1600
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  1700
+training @ iter =  1800
+--> train error =  0.2
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  1900
+iter  1999  validation
+epoch 1, iter 2000, validation error 2.081000 %
+epoch 1, iter 2000, train error 0.000000 %
+patience =  50000 0.99 3998
+FPR, FNR =  0.0280672602765 0.0134657895882
+training @ iter =  2000
+--> train error =  0.14
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  2100
+--> train error =  0.42
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  2200
+--> train error =  0.2
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  2300
+training @ iter =  2400
+training @ iter =  2500
+training @ iter =  2600
+training @ iter =  2700
+training @ iter =  2800
+training @ iter =  2900
+training @ iter =  3000
+training @ iter =  3100
+training @ iter =  3200
+training @ iter =  3300
+training @ iter =  3400
+training @ iter =  3500
+training @ iter =  3600
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  3700
+training @ iter =  3800
+training @ iter =  3900
+iter  3999  validation
+epoch 2, iter 4000, validation error 1.682000 %
+epoch 2, iter 4000, train error 0.000000 %
+patience =  50000 0.99 7998
+FPR, FNR =  0.0217681300081 0.0117969897194
+training @ iter =  4000
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  4100
+--> train error =  0.42
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  4200
+training @ iter =  4300
+training @ iter =  4400
+training @ iter =  4500
+--> train error =  0.12
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  4600
+training @ iter =  4700
+training @ iter =  4800
+training @ iter =  4900
+training @ iter =  5000
+training @ iter =  5100
+training @ iter =  5200
+training @ iter =  5300
+training @ iter =  5400
+training @ iter =  5500
+training @ iter =  5600
+training @ iter =  5700
+training @ iter =  5800
+training @ iter =  5900
+iter  5999  validation
+epoch 3, iter 6000, validation error 1.527000 %
+epoch 3, iter 6000, train error 0.000000 %
+patience =  50000 0.99 11998
+FPR, FNR =  0.0193611839823 0.0111683875257
+training @ iter =  6000
+training @ iter =  6100
+--> train error =  0.24
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  6200
+training @ iter =  6300
+training @ iter =  6400
+training @ iter =  6500
+training @ iter =  6600
+training @ iter =  6700
+training @ iter =  6800
+training @ iter =  6900
+training @ iter =  7000
+training @ iter =  7100
+training @ iter =  7200
+training @ iter =  7300
+training @ iter =  7400
+training @ iter =  7500
+training @ iter =  7600
+training @ iter =  7700
+training @ iter =  7800
+training @ iter =  7900
+iter  7999  validation
+epoch 4, iter 8000, validation error 1.439000 %
+epoch 4, iter 8000, train error 0.000000 %
+patience =  50000 0.99 15998
+FPR, FNR =  0.0176534144767 0.0110964454198
+training @ iter =  8000
+training @ iter =  8100
+--> train error =  0.16
+-->  20 0 chunk_154_5000.pkl
+training @ iter =  8200
+training @ iter =  8300
+training @ iter =  8400
+training @ iter =  8500
+training @ iter =  8600
+training @ iter =  8700
+training @ iter =  8800
+training @ iter =  8900
+training @ iter =  9000
+training @ iter =  9100
+training @ iter =  9200
+training @ iter =  9300
+training @ iter =  9400
+training @ iter =  9500
+training @ iter =  9600
+training @ iter =  9700
+training @ iter =  9800
+training @ iter =  9900
+iter  9999  validation
+epoch 5, iter 10000, validation error 1.390000 %
+epoch 5, iter 10000, train error 0.000000 %
+patience =  50000 0.99 19998
+FPR, FNR =  0.0165409684554 0.0112362715835
+training @ iter =  10000
+training @ iter =  10100
+training @ iter =  10200
+training @ iter =  10300
+training @ iter =  10400
+training @ iter =  10500
+training @ iter =  10600
+training @ iter =  10700
+training @ iter =  10800
+training @ iter =  10900
+training @ iter =  11000
+training @ iter =  11100
+training @ iter =  11200
+training @ iter =  11300
+training @ iter =  11400
+training @ iter =  11500
+training @ iter =  11600
+training @ iter =  11700
+training @ iter =  11800
+training @ iter =  11900
+iter  11999  validation
+epoch 6, iter 12000, validation error 1.368000 %
+epoch 6, iter 12000, train error 0.000000 %
+patience =  50000 0.99 23998
+FPR, FNR =  0.0162211195994 0.0111250925874
+training @ iter =  12000
+training @ iter =  12100
+training @ iter =  12200
+training @ iter =  12300
+training @ iter =  12400
+training @ iter =  12500
+training @ iter =  12600
+training @ iter =  12700
+training @ iter =  12800
+training @ iter =  12900
+training @ iter =  13000
+training @ iter =  13100
+training @ iter =  13200
+training @ iter =  13300
+training @ iter =  13400
+training @ iter =  13500
+training @ iter =  13600
+training @ iter =  13700
+training @ iter =  13800
+training @ iter =  13900
+iter  13999  validation
+epoch 7, iter 14000, validation error 1.359000 %
+epoch 7, iter 14000, train error 0.000000 %
+FPR, FNR =  0.0158014372364 0.011341542515
+training @ iter =  14000
+training @ iter =  14100
+training @ iter =  14200
+training @ iter =  14300
+training @ iter =  14400
+training @ iter =  14500
+training @ iter =  14600
+training @ iter =  14700
+training @ iter =  14800
+training @ iter =  14900
+training @ iter =  15000
+training @ iter =  15100
+training @ iter =  15200
+training @ iter =  15300
+training @ iter =  15400
+training @ iter =  15500
+training @ iter =  15600
+training @ iter =  15700
+training @ iter =  15800
+training @ iter =  15900
+iter  15999  validation
+epoch 8, iter 16000, validation error 1.362000 %
+epoch 8, iter 16000, train error 0.000000 %
+training @ iter =  16000
+training @ iter =  16100
+training @ iter =  16200
+training @ iter =  16300
+training @ iter =  16400
+training @ iter =  16500
+training @ iter =  16600
+training @ iter =  16700
+training @ iter =  16800
+training @ iter =  16900
+training @ iter =  17000
+training @ iter =  17100
+training @ iter =  17200
+training @ iter =  17300
+training @ iter =  17400
+training @ iter =  17500
+training @ iter =  17600
+training @ iter =  17700
+training @ iter =  17800
+training @ iter =  17900
+iter  17999  validation
+epoch 9, iter 18000, validation error 1.375000 %
+epoch 9, iter 18000, train error 0.000000 %
+training @ iter =  18000
+training @ iter =  18100
+training @ iter =  18200
+training @ iter =  18300
+training @ iter =  18400
+training @ iter =  18500
+training @ iter =  18600
+training @ iter =  18700
+training @ iter =  18800
+training @ iter =  18900
+training @ iter =  19000
+training @ iter =  19100
+training @ iter =  19200
+training @ iter =  19300
+training @ iter =  19400
+training @ iter =  19500
+training @ iter =  19600
+training @ iter =  19700
+training @ iter =  19800
+training @ iter =  19900
+iter  19999  validation
+epoch 10, iter 20000, validation error 1.371000 %
+epoch 10, iter 20000, train error 0.000000 %
+training @ iter =  20000
+training @ iter =  20100
+training @ iter =  20200
+training @ iter =  20300
+training @ iter =  20400
+training @ iter =  20500
+training @ iter =  20600
+training @ iter =  20700
+training @ iter =  20800
+training @ iter =  20900
+training @ iter =  21000
+training @ iter =  21100
+training @ iter =  21200
+training @ iter =  21300
+training @ iter =  21400
+training @ iter =  21500
+training @ iter =  21600
+training @ iter =  21700
+training @ iter =  21800
+training @ iter =  21900
+iter  21999  validation
+epoch 11, iter 22000, validation error 1.392000 %
+epoch 11, iter 22000, train error 0.000000 %
+training @ iter =  22000
+training @ iter =  22100
+training @ iter =  22200
+training @ iter =  22300
+training @ iter =  22400
+training @ iter =  22500
+training @ iter =  22600
+training @ iter =  22700
+training @ iter =  22800
+training @ iter =  22900
+training @ iter =  23000
+training @ iter =  23100
+training @ iter =  23200
+training @ iter =  23300
+training @ iter =  23400
+training @ iter =  23500
+training @ iter =  23600
+training @ iter =  23700
+training @ iter =  23800
+training @ iter =  23900
+iter  23999  validation
+epoch 12, iter 24000, validation error 1.383000 %
+epoch 12, iter 24000, train error 0.000000 %
+training @ iter =  24000
+training @ iter =  24100
+training @ iter =  24200
+training @ iter =  24300
+training @ iter =  24400
+training @ iter =  24500
+training @ iter =  24600
+training @ iter =  24700
+training @ iter =  24800
+training @ iter =  24900
+training @ iter =  25000
+training @ iter =  25100
+training @ iter =  25200
+training @ iter =  25300
+training @ iter =  25400
+training @ iter =  25500
+training @ iter =  25600
+training @ iter =  25700
+training @ iter =  25800
+training @ iter =  25900
+iter  25999  validation
+epoch 13, iter 26000, validation error 1.377000 %
+epoch 13, iter 26000, train error 0.000000 %
+training @ iter =  26000
+training @ iter =  26100
+training @ iter =  26200
+training @ iter =  26300
+training @ iter =  26400
+training @ iter =  26500
+training @ iter =  26600
+training @ iter =  26700
+training @ iter =  26800
+training @ iter =  26900
+training @ iter =  27000
+training @ iter =  27100
+training @ iter =  27200
+training @ iter =  27300
+training @ iter =  27400
+training @ iter =  27500
+training @ iter =  27600
+training @ iter =  27700
+training @ iter =  27800
+training @ iter =  27900
+iter  27999  validation
+epoch 14, iter 28000, validation error 1.401000 %
+epoch 14, iter 28000, train error 0.000000 %
+training @ iter =  28000
+training @ iter =  28100
+training @ iter =  28200
+training @ iter =  28300
+training @ iter =  28400
+training @ iter =  28500
+training @ iter =  28600
+training @ iter =  28700
+training @ iter =  28800
+training @ iter =  28900
+training @ iter =  29000
+training @ iter =  29100
+training @ iter =  29200
+training @ iter =  29300
+training @ iter =  29400
+training @ iter =  29500
+training @ iter =  29600
+training @ iter =  29700
+training @ iter =  29800
+training @ iter =  29900
+Learning rate:  0.0500000007451
+iter  29999  validation
+epoch 15, iter 30000, validation error 1.413000 %
+epoch 15, iter 30000, train error 0.000000 %
+training @ iter =  30000
+training @ iter =  30100
+training @ iter =  30200
+training @ iter =  30300
+training @ iter =  30400
+training @ iter =  30500
+training @ iter =  30600
+training @ iter =  30700
+training @ iter =  30800
+training @ iter =  30900
+training @ iter =  31000
+training @ iter =  31100
+training @ iter =  31200
+training @ iter =  31300
+training @ iter =  31400
+training @ iter =  31500
+training @ iter =  31600
+training @ iter =  31700
+training @ iter =  31800
+training @ iter =  31900
+iter  31999  validation
+epoch 16, iter 32000, validation error 1.409000 %
+epoch 16, iter 32000, train error 0.000000 %
+training @ iter =  32000
+training @ iter =  32100
+training @ iter =  32200
+training @ iter =  32300
+training @ iter =  32400
+training @ iter =  32500
+training @ iter =  32600
+training @ iter =  32700
+training @ iter =  32800
+training @ iter =  32900
+training @ iter =  33000
+training @ iter =  33100
+training @ iter =  33200
+training @ iter =  33300
+training @ iter =  33400
+training @ iter =  33500
+training @ iter =  33600
+training @ iter =  33700
+training @ iter =  33800
+training @ iter =  33900
+iter  33999  validation
+epoch 17, iter 34000, validation error 1.413000 %
+epoch 17, iter 34000, train error 0.000000 %
+training @ iter =  34000
+training @ iter =  34100
+training @ iter =  34200
+training @ iter =  34300
+training @ iter =  34400
+training @ iter =  34500
+training @ iter =  34600
+training @ iter =  34700
+training @ iter =  34800
+training @ iter =  34900
+training @ iter =  35000
+training @ iter =  35100
+training @ iter =  35200
+training @ iter =  35300
+training @ iter =  35400
+training @ iter =  35500
+training @ iter =  35600
+training @ iter =  35700
+training @ iter =  35800
+training @ iter =  35900
+iter  35999  validation
+epoch 18, iter 36000, validation error 1.412000 %
+epoch 18, iter 36000, train error 0.000000 %
+training @ iter =  36000
+training @ iter =  36100
+training @ iter =  36200
+training @ iter =  36300
+training @ iter =  36400
+training @ iter =  36500
+training @ iter =  36600
+training @ iter =  36700
+training @ iter =  36800
+training @ iter =  36900
+training @ iter =  37000
+training @ iter =  37100
+training @ iter =  37200
+training @ iter =  37300
+training @ iter =  37400
+training @ iter =  37500
+training @ iter =  37600
+training @ iter =  37700
+training @ iter =  37800
+training @ iter =  37900
+iter  37999  validation
+epoch 19, iter 38000, validation error 1.404000 %
+epoch 19, iter 38000, train error 0.000000 %
+training @ iter =  38000
+training @ iter =  38100
+training @ iter =  38200
+training @ iter =  38300
+training @ iter =  38400
+training @ iter =  38500
+training @ iter =  38600
+training @ iter =  38700
+training @ iter =  38800
+training @ iter =  38900
+training @ iter =  39000
+training @ iter =  39100
+training @ iter =  39200
+training @ iter =  39300
+training @ iter =  39400
+training @ iter =  39500
+training @ iter =  39600
+training @ iter =  39700
+training @ iter =  39800
+training @ iter =  39900
+iter  39999  validation
+epoch 20, iter 40000, validation error 1.409000 %
+epoch 20, iter 40000, train error 0.000000 %
+training @ iter =  40000
+training @ iter =  40100
+training @ iter =  40200
+training @ iter =  40300
+training @ iter =  40400
+training @ iter =  40500
+training @ iter =  40600
+training @ iter =  40700
+training @ iter =  40800
+training @ iter =  40900
+training @ iter =  41000
+training @ iter =  41100
+training @ iter =  41200
+training @ iter =  41300
+training @ iter =  41400
+training @ iter =  41500
+training @ iter =  41600
+training @ iter =  41700
+training @ iter =  41800
+training @ iter =  41900
+iter  41999  validation
+epoch 21, iter 42000, validation error 1.411000 %
+epoch 21, iter 42000, train error 0.000000 %
+training @ iter =  42000
+training @ iter =  42100
+training @ iter =  42200
+training @ iter =  42300
+training @ iter =  42400
+training @ iter =  42500
+training @ iter =  42600
+training @ iter =  42700
+training @ iter =  42800
+training @ iter =  42900
+training @ iter =  43000
+training @ iter =  43100
+training @ iter =  43200
+training @ iter =  43300
+training @ iter =  43400
+training @ iter =  43500
+training @ iter =  43600
+training @ iter =  43700
+training @ iter =  43800
+training @ iter =  43900
+iter  43999  validation
+epoch 22, iter 44000, validation error 1.408000 %
+epoch 22, iter 44000, train error 0.000000 %
+training @ iter =  44000
+training @ iter =  44100
+training @ iter =  44200
+training @ iter =  44300
+training @ iter =  44400
+training @ iter =  44500
+training @ iter =  44600
+training @ iter =  44700
+training @ iter =  44800
+training @ iter =  44900
+training @ iter =  45000
+training @ iter =  45100
+training @ iter =  45200
+training @ iter =  45300
+training @ iter =  45400
+training @ iter =  45500
+training @ iter =  45600
+training @ iter =  45700
+training @ iter =  45800
+training @ iter =  45900
+iter  45999  validation
+epoch 23, iter 46000, validation error 1.412000 %
+epoch 23, iter 46000, train error 0.000000 %
+training @ iter =  46000
+training @ iter =  46100
+training @ iter =  46200
+training @ iter =  46300
+training @ iter =  46400
+training @ iter =  46500
+training @ iter =  46600
+training @ iter =  46700
+training @ iter =  46800
+training @ iter =  46900
+training @ iter =  47000
+training @ iter =  47100
+training @ iter =  47200
+training @ iter =  47300
+training @ iter =  47400
+training @ iter =  47500
+training @ iter =  47600
+training @ iter =  47700
+training @ iter =  47800
+training @ iter =  47900
+iter  47999  validation
+epoch 24, iter 48000, validation error 1.424000 %
+epoch 24, iter 48000, train error 0.000000 %
+training @ iter =  48000
+training @ iter =  48100
+training @ iter =  48200
+training @ iter =  48300
+training @ iter =  48400
+training @ iter =  48500
+training @ iter =  48600
+training @ iter =  48700
+training @ iter =  48800
+training @ iter =  48900
+training @ iter =  49000
+training @ iter =  49100
+training @ iter =  49200
+training @ iter =  49300
+training @ iter =  49400
+training @ iter =  49500
+training @ iter =  49600
+training @ iter =  49700
+training @ iter =  49800
+training @ iter =  49900
+iter  49999  validation
+epoch 25, iter 50000, validation error 1.426000 %
+epoch 25, iter 50000, train error 0.000000 %
+training @ iter =  50000
+patience <= iter 50000 50000
+Optimization complete.
+batch_size =  50
+test set =  100000
+test_pred: [[  9.99981880e-01   1.80754705e-05]
+ [  6.28068938e-06   9.99993682e-01]
+ [  9.99920964e-01   7.89959886e-05]
+ ..., 
+ [  4.54478732e-06   9.99995470e-01]
+ [  5.24403094e-06   9.99994755e-01]
+ [  9.99999642e-01   3.08902969e-07]]
+Best validation score of 1.359000 % obtained at iteration 14000, with test performance 1.371000 %
