@@ -3,6 +3,7 @@ path_to_chunks: /home/ireyes/chunks_feat
 base_lr: 0.1
 gamma: 0.5
 stepsize: 50000
+momentum: 0.0
 n_epochs: 100
 batch_size: 50
 N_valid = 100000

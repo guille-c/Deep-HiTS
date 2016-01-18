@@ -118,8 +118,43 @@ class LeNetConvPoolLayer(object):
         # store parameters of this layer
         self.params = [self.W, self.b]
 
+def gradient_updates_momentum(cost, params, learning_rate, momentum):
+    '''
+    Compute updates for gradient descent with momentum
+    
+    :parameters:
+        - cost : theano.tensor.var.TensorVariable
+            Theano cost function to minimize
+        - params : list of theano.tensor.var.TensorVariable
+            Parameters to compute gradient against
+        - learning_rate : float
+            Gradient descent learning rate
+        - momentum : float
+            Momentum parameter, should be at least 0 (standard gradient descent) and less than 1
+   
+    :returns:
+        updates : list
+            List of updates, one for each parameter
+    '''
+    # Make sure momentum is a sane value
+    assert momentum < 1 and momentum >= 0
+    # List of update steps for each parameter
+    updates = []
+    # Just gradient descent on cost
+    for param in params:
+        # For each parameter, we'll create a param_update shared variable.
+        # This variable will keep track of the parameter's update step across iterations.
+        # We initialize it to 0
+        param_update = theano.shared(param.get_value()*0., broadcastable=param.broadcastable)
+        # Each parameter is updated by taking a step in the direction of the gradient.
+        # However, we also "mix in" the previous step according to the given momentum value.
+        # Note that when updating param_update, we are using its old value and also the new gradient step.
+        updates.append((param, param - learning_rate*param_update))
+        # Note that we don't need to derive backpropagation to compute updates - just use T.grad!
+        updates.append((param_update, momentum*param_update + (1. - momentum)*T.grad(cost, param)))
+    return updates
 
-def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
+def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5, momentum=0.9,
                      n_epochs= 10000,
                      nkerns=[20, 50], batch_size=500,
                      N_valid = 100000, N_test = 100000,
@@ -181,7 +216,8 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
     
     # allocate symbolic variables for the data
     index = T.lscalar()  # index to a [mini]batch
-
+    lr = T.fscalar() # learning rate symbolic variable
+    
     # start-snippet-1
     x = T.matrix('x')   # the data is presented as rasterized images
     y = T.ivector('y')  # the labels are presented as 1D vector of
@@ -266,16 +302,12 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
     # rule for each model parameter. We thus create the updates list
     # by automatically looping over all (params[i], grads[i]) pairs.
 
-    learning_rate = theano.shared(np.array(base_lr, dtype=theano.config.floatX))
-    updates = [
-        (param_i, param_i - learning_rate * grad_i)
-        for param_i, grad_i in zip(params, grads)
-    ]
+    learning_rate = base_lr
 
     train_model = theano.function(
-        [index],
+        [index, lr],
         cost,
-        updates=updates,
+        updates=gradient_updates_momentum(cost, params, lr, momentum),
         givens={
             x: train_set_x[index * batch_size: (index + 1) * batch_size],
             y: train_set_y[index * batch_size: (index + 1) * batch_size]
@@ -381,7 +413,7 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
             train_set_x.set_value(chunk_x)
 	    train_set_y.set_value(chunk_y)
             #cost_ij = train_model(minibatch_index)
-            cost_ij = train_model(0)
+            cost_ij = train_model(0, learning_rate)
             train_loss_history.append(cost_ij.tolist())
             train_minibatch_error = test_model_train(0)
 	    train_err_history.append(train_minibatch_error)
@@ -393,8 +425,9 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
 
 	    # Adaptive Learning Rate
 	    if (iter+1) % stepsize == 0:
-		learning_rate.set_value(np.array(learning_rate.get_value()*gamma, dtype="float32"))
-		print "Learning rate: ", learning_rate.get_value()
+                learning_rate = learning_rate*gamma
+		#learning_rate.set_value(np.array(learning_rate.get_value()*gamma, dtype="float32"))
+		print "Learning rate: ", learning_rate#learning_rate.get_value()
 
 	    #VALIDATION
             if (iter + 1) % validation_frequency == 0:
@@ -595,6 +628,7 @@ if __name__ == '__main__':
                      base_lr = float (c.get("vars", "base_lr")),
 		     stepsize = int (c.get("vars", "stepsize")),
 		     gamma = float (c.get("vars", "gamma")),
+                     momentum = float (c.get("vars","momentum")),
                      n_epochs = int (c.get("vars", "n_epochs")),
                      nkerns=[20, 50],
                      batch_size = int (c.get("vars", "batch_size")),
