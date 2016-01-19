@@ -158,7 +158,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                      n_epochs= 10000,
                      nkerns=[20, 50], batch_size=500,
                      N_valid = 100000, N_test = 100000,
-                     validate_every_batches = 100, n_rot = 3, activation = T.tanh):
+                     validate_every_batches = 100, n_rot = 3, activation = T.tanh,
+                     tiny_train = False):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -174,6 +175,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     :type nkerns: list of ints
     :param nkerns: number of kernels on each layer
     """
+    print "nkerns = ", nkerns, nkerns.shape
 
     rng = numpy.random.RandomState(23455)
     #im_chan = 16
@@ -395,11 +397,12 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     while (epoch < n_epochs) and (not done_looping):
         epoch = epoch + 1
         #for minibatch_index in xrange(n_train_batches):
-        while not chunkLoader.done:
+        epoch_done = False
+        minibatch_index = 0
+        while not epoch_done:
             iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
             if iter % 100 == 0:
                 print 'training @ iter = ', iter
-
             chunk_x, chunk_y = chunkLoader.getNext()
             # bad chunk
             #if (chunkLoader.current_file == 239 and
@@ -415,8 +418,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
             #cost_ij = train_model(minibatch_index)
             cost_ij = train_model(0, learning_rate)
             train_loss_history.append(cost_ij.tolist())
-            train_minibatch_error = test_model_train(0)
-	    train_err_history.append(train_minibatch_error)
+            train_err_history.append(train_minibatch_error)
             iter_train_history.append(iter+1)
 
             if train_minibatch_error > 0.1:
@@ -525,6 +527,10 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     del(valid_set_x)
     del(valid_set_y)
 
+    train_set_x.set_value([[]])
+    train_set_y.set_value([])
+    del(train_set_x)
+    del(train_set_y)
 
     # Loading test data
     chunkLoader = ChunkLoader(data_path + '/chunks_test/',
@@ -623,7 +629,13 @@ if __name__ == '__main__':
         activation = T.tanh
     elif c.get("vars", "activation_function") == "ReLU":
         activation = relu
-        
+
+    tiny_train = c.get("vars", "tiny_train")
+    if tiny_train == "False":
+        tiny_train = False
+    else:
+        tiny_train = int(tiny_train)
+
     evaluate_convnet(c.get("vars", "path_to_chunks"),
                      int(c.get("vars", "n_cand_chunk")),
                      base_lr = float (c.get("vars", "base_lr")),
@@ -631,7 +643,8 @@ if __name__ == '__main__':
 		     gamma = float (c.get("vars", "gamma")),
                      momentum = float (c.get("vars","momentum")),
                      n_epochs = int (c.get("vars", "n_epochs")),
-                     nkerns=[20, 50],
+                     #nkerns=[20, 50],
+                     nkerns = np.array(c.get("vars", "nkerns").split (","), dtype = int),
                      batch_size = int (c.get("vars", "batch_size")),
                      N_valid = int (c.get("vars", "N_valid")),
                      N_test = int (c.get("vars", "N_test")),
@@ -639,7 +652,8 @@ if __name__ == '__main__':
                      validate_every_batches = int (c.get("vars",
                                                          "validate_every_batches")),
                      n_rot = int (c.get("vars", "n_rot")),
-                     activation = activation)
+                     activation = activation,
+    		     tiny_train = tiny_train)
 
 
 def experiment(state, channel):
