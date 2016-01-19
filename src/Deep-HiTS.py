@@ -140,6 +140,7 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5,
     :type nkerns: list of ints
     :param nkerns: number of kernels on each layer
     """
+    print "nkerns = ", nkerns, nkerns.shape
 
     rng = numpy.random.RandomState(23455)
     #im_chan = 16
@@ -624,7 +625,8 @@ if __name__ == '__main__':
 		     stepsize = int (c.get("vars", "stepsize")),
 		     gamma = float (c.get("vars", "gamma")),
                      n_epochs = int (c.get("vars", "n_epochs")),
-                     nkerns=[20, 50],
+                     #nkerns=[20, 50],
+                     nkerns = np.array(c.get("vars", "nkerns").split (","), dtype = int),
                      batch_size = int (c.get("vars", "batch_size")),
                      N_valid = int (c.get("vars", "N_valid")),
                      N_test = int (c.get("vars", "N_test")),
