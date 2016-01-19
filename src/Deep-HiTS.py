@@ -154,7 +154,7 @@ def gradient_updates_momentum(cost, params, learning_rate, momentum):
         updates.append((param_update, momentum*param_update + (1. - momentum)*T.grad(cost, param)))
     return updates
 
-def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5, momentum=0.9,
+def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma = 0.5, momentum=0.9,
                      n_epochs= 10000,
                      nkerns=[20, 50], batch_size=500,
                      N_valid = 100000, N_test = 100000,
@@ -183,7 +183,7 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5, moment
     train_set_x, train_set_y = shared_dataset((np.ones((1, 441*im_chan)), np.ones(1)))
     
     chunkLoader = ChunkLoader(data_path + '/chunks_validate/',
-                              n_rot = n_rot)
+                              n_cand_chunk, n_cand_chunk, n_rot = n_rot)
 
     v_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
     v_y = np.array([], dtype = "int32")
@@ -197,7 +197,7 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5, moment
 
 
     chunkLoader = ChunkLoader(data_path + '/chunks_train/',
-                              batch_size = batch_size, n_rot = n_rot)
+                              n_cand_chunk, batch_size, n_rot = n_rot)
     #valid_set_x, valid_set_y = datasets[1]
     #test_set_x, test_set_y   = datasets[2]
     
@@ -528,7 +528,7 @@ def evaluate_convnet(data_path, base_lr=0.1, stepsize=50000, gamma = 0.5, moment
 
     # Loading test data
     chunkLoader = ChunkLoader(data_path + '/chunks_test/',
-                              n_rot = n_rot)
+                              n_cand_chunk, n_cand_chunk, n_rot = n_rot)
 
     SNRs = []
     t_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
@@ -625,6 +625,7 @@ if __name__ == '__main__':
         activation = relu
         
     evaluate_convnet(c.get("vars", "path_to_chunks"),
+                     int(c.get("vars", "n_cand_chunk")),
                      base_lr = float (c.get("vars", "base_lr")),
 		     stepsize = int (c.get("vars", "stepsize")),
 		     gamma = float (c.get("vars", "gamma")),

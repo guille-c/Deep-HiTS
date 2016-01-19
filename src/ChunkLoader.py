@@ -14,7 +14,7 @@ from mlp import HiddenLayer
 from loadHITS import *
 
 class ChunkLoader():
-    def __init__(self, folder, n_cand_chunk = 5000, batch_size=500, n_rot = 3):
+    def __init__(self, folder, n_cand_chunk, batch_size, n_rot = 3):
 	self.files = os.listdir(folder)
         self.files.sort()
 	self.current_file = 0
