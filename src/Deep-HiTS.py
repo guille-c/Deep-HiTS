@@ -159,7 +159,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                      nkerns=[20, 50], batch_size=500,
                      N_valid = 100000, N_test = 100000,
                      validate_every_batches = 100, n_rot = 3, activation = T.tanh,
-                     tiny_train = False):
+                     tiny_train = False, buf_size=1000):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -183,7 +183,12 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
 
     # Creation of validation and test sets
     train_set_x, train_set_y = shared_dataset((np.ones((1, 441*im_chan)), np.ones(1)))
-    
+
+    assert buf_size%batch_size==0
+    assert buf_size>batch_size
+    buf_train_set_x, buf_train_set_y = shared_dataset((np.ones((buf_size,441*im_chan)), np.ones(buf_size)))
+    local_buf_x = buf_train_set_x.get_value()
+    local_buf_y = buf_train_set_y.get_value()
     chunkLoader = ChunkLoader(data_path + '/chunks_validate/',
                               n_cand_chunk, n_cand_chunk, n_rot = n_rot)
 
@@ -368,6 +373,14 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
             y: train_set_y[index * batch_size: (index + 1) * batch_size]
         }
     )
+    train_buffer_error = theano.function(
+        [index],
+        layer3.errors(y),
+        givens={
+            x: buf_train_set_x[index * batch_size: (index + 1) * batch_size],
+            y: buf_train_set_y[index * batch_size: (index + 1) * batch_size]
+        }
+    )
     # end-snippet-1
 
     ###############
@@ -408,6 +421,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     iter_val_history = []
     best_params = params
     iter = 0
+    buf_index = 0
+    train_buf_err_history = []
     # Maximum number of epochs = n_epochs
     while (epoch < n_epochs) and (not done_looping):
         epoch = epoch + 1
@@ -432,6 +447,12 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 chunk_x, chunk_y = chunkLoader.getNext()
                 train_set_x.set_value(chunk_x)
 	        train_set_y.set_value(chunk_y)
+
+                local_buf_x[buf_index:buf_index+batch_size] = chunk_x
+                local_buf_y[buf_index:buf_index+batch_size] = chunk_y
+
+                buf_index = (buf_index+batch_size)%buf_size
+                
                 cost_ij = train_model(0, learning_rate)
                 train_minibatch_error = test_model_train(0)
                 epoch_done = chunkLoader.done
@@ -441,7 +462,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
             iter_train_history.append(iter+1)
 
             if train_minibatch_error > 0.1:
-                print "--> train error = ", train_minibatch_error
+                print "--> train minibatch error = ", train_minibatch_error
                 print "--> ", chunkLoader.current_file, chunkLoader.batch_i, chunkLoader.files[chunkLoader.current_file]
 
 	    # Adaptive Learning Rate
@@ -462,10 +483,20 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 print('epoch %i, iter %i, validation error %f %%' %
                       (epoch, iter + 1,
                        this_validation_loss * 100.))
-                print('epoch %i, iter %i, train error %f %%' %
+                print('epoch %i, iter %i, train minibatch error %f %%' %
                       (epoch, iter + 1,
                        train_minibatch_error * 100.))
-
+                
+                # Error calculation for the training buffer
+                if not tiny_train:
+                    buf_train_set_x.set_value(local_buf_x)
+                    buf_train_set_y.set_value(local_buf_y)
+                    buffer_errors = [train_buffer_error(i) for i in xrange(buf_size/batch_size)]
+                    train_buf_err = numpy.mean(buffer_errors)
+                    train_buf_err_history.append(train_buf_err)
+                    print('epoch %i, iter %i, train buffer error %f %%' %
+                          (epoch, iter + 1,
+                           train_buf_err * 100.))
                 # if we got the best validation score until now
                 if this_validation_loss < best_validation_loss:
 
@@ -620,7 +651,10 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                      'train_err_history': train_err_history,
                      'train_loss_history': train_loss_history},
                     f, pickle.HIGHEST_PROTOCOL)
-
+    with open("training_buffer_history.pkl", "w") as f:
+        pickle.dump({'iter_train_buf_history': iter_val_history,
+                     'train_buf_err_history': train_buf_err_history},
+                    f, pickle.HIGHEST_PROTOCOL)
     with open("validation_history.pkl", "w") as f:
         pickle.dump({'iter_val_history': iter_val_history,
                      'val_err_history': val_err_history},
