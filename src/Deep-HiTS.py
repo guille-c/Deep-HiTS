@@ -415,13 +415,15 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
         epoch_done = False
         minibatch_index = 0
         while not epoch_done:
-            iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
+            #iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
+            #print 'DEBUGGING', iter
+            sys.stdout.flush()
             if iter % 100 == 0:
                 print 'training @ iter = ', iter
 
             if tiny_train:
                 iter = (epoch - 1) * n_train_batches + minibatch_index
-                cost_ij = train_model(minibatch_index)
+                cost_ij = train_model(minibatch_index, learning_rate)
                 train_minibatch_error = test_model_train(minibatch_index)
                 minibatch_index += 1
                 epoch_done = (minibatch_index == n_train_batches)
@@ -430,7 +432,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 chunk_x, chunk_y = chunkLoader.getNext()
                 train_set_x.set_value(chunk_x)
 	        train_set_y.set_value(chunk_y)
-                cost_ij = train_model(0)
+                cost_ij = train_model(0, learning_rate)
                 train_minibatch_error = test_model_train(0)
                 epoch_done = chunkLoader.done
 
