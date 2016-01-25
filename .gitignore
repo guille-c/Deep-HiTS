@@ -1,1 +1,3 @@
 *.pyc
+runs/RF_50000/*.pyc
+runs/RF_50000/*.npy
