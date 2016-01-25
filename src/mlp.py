@@ -33,6 +33,34 @@ import theano.tensor as T
 
 from logistic_sgd import LogisticRegression, load_data
 
+from theano.sandbox.rng_mrg import MRG_RandomStreams
+srng = MRG_RandomStreams()
+
+class DropoutLayer(object):
+    instances = []
+    def __init__(self, input, p_drop=0.5):
+        assert p_drop>=0 and p_drop<1
+
+        self.input = input
+        self.isActive = theano.shared(numpy.asarray(0,
+                                                    dtype=theano.config.floatX),
+                                      borrow=True)
+        self.drop_prob = p_drop
+        self.activated = srng.binomial(self.input.shape, p=(1-self.drop_prob), dtype='int32').astype('float32')
+        self.output = self.isActive*self.activated*self.input +\
+                      (1-self.isActive)*self.drop_prob*self.input
+        self.instances.append(self)
+
+    @staticmethod
+    def activate():
+        for instance in DropoutLayer.instances:
+            instance.isActive.set_value(1.0)
+
+    @staticmethod
+    def deactivate():
+        for instance in DropoutLayer.instances:
+            instance.isActive.set_value(0.0)
+
 # start-snippet-1
 class HiddenLayer(object):
     def __init__(self, rng, input, n_in, n_out, W=None, b=None,

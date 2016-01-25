@@ -33,7 +33,7 @@ from theano.tensor.signal import downsample
 from theano.tensor.nnet import conv
 
 from logistic_sgd import LogisticRegression, load_data
-from mlp import HiddenLayer
+from mlp import HiddenLayer, DropoutLayer
 from loadHITS import *
 from ChunkLoader import *
 
@@ -156,7 +156,7 @@ def gradient_updates_momentum(cost, params, learning_rate, momentum):
 
 def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma = 0.5, momentum=0.9,
                      n_epochs= 10000,
-                     nkerns=[20, 50], batch_size=500,
+                     nkerns=[20, 50], n_hidden=200, batch_size=500,
                      N_valid = 100000, N_test = 100000,
                      validate_every_batches = 100, n_rot = 3, activation = T.tanh,
                      tiny_train = False, buf_size=1000):
@@ -300,14 +300,25 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
         rng,
         input=layer2_input,
         n_in=nkerns[1] * maxpool_size2 * maxpool_size2,
-        n_out=batch_size,
+        n_out=n_hidden,
         activation=activation
         #activation=T.tanh
         #activation=relu
     )
 
+
+
+
+    # #################DROPOUT############## 
+    drop_layer2 = DropoutLayer(layer2.output, p_drop=0.5)
+
+
+
+
+
+    
     # classify the values of the fully-connected sigmoidal layer
-    layer3 = LogisticRegression(input=layer2.output, n_in=batch_size, n_out=2)
+    layer3 = LogisticRegression(input=drop_layer2.output, n_in=n_hidden, n_out=2)
 
     # the cost we minimize during training is the NLL of the model
     cost = layer3.negative_log_likelihood(y)
@@ -424,6 +435,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     buf_index = 0
     train_buf_err_history = []
     # Maximum number of epochs = n_epochs
+
+    DropoutLayer.activate()
     while (epoch < n_epochs) and (not done_looping):
         epoch = epoch + 1
         #for minibatch_index in xrange(n_train_batches):
@@ -454,7 +467,9 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 buf_index = (buf_index+batch_size)%buf_size
                 
                 cost_ij = train_model(0, learning_rate)
+                DropoutLayer.deactivate()
                 train_minibatch_error = test_model_train(0)
+                DropoutLayer.activate()
                 epoch_done = chunkLoader.done
 
             train_loss_history.append(cost_ij.tolist())
@@ -473,6 +488,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
 
 	    #VALIDATION
             if (iter + 1) % validation_frequency == 0:
+                DropoutLayer.deactivate()
                 print "iter ", iter, " validation"
                 # compute zero-one loss on validation set
                 validation_losses = [validate_model(i) for i
@@ -547,6 +563,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                     times.append(time.clock()-start_time)
                     FPRs.append(FPR)
                     FNRs.append(FNR)
+                DropoutLayer.activate()
 
             if patience <= iter:
                 done_looping = True
@@ -619,6 +636,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     )
 
     ############## TESTING #############
+    DropoutLayer.deactivate()
+    
     params = best_params
     test_pred = np.array([predict (i)
                           for i in xrange(n_test_batches)])
@@ -698,6 +717,7 @@ if __name__ == '__main__':
                      n_epochs = int (c.get("vars", "n_epochs")),
                      #nkerns=[20, 50],
                      nkerns = np.array(c.get("vars", "nkerns").split (","), dtype = int),
+                     n_hidden = int(c.get("vars", "n_hidden")),
                      batch_size = int (c.get("vars", "batch_size")),
                      N_valid = int (c.get("vars", "N_valid")),
                      N_test = int (c.get("vars", "N_test")),
