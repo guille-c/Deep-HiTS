@@ -412,6 +412,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                                   # check every epoch
 
     best_validation_loss = numpy.inf
+    patience_loss = numpy.inf
     best_iter = 0
     test_score = 0.
     start_time = time.clock()
@@ -446,8 +447,6 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
             #iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
             #print 'DEBUGGING', iter
             sys.stdout.flush()
-            if iter % 100 == 0:
-                print 'training @ iter = ', iter
 
             if tiny_train:
                 iter = (epoch - 1) * n_train_batches + minibatch_index
@@ -472,6 +471,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 DropoutLayer.activate()
                 epoch_done = chunkLoader.done
 
+            if iter % 100 == 0:
+                print 'training @ iter = ', iter, ", cost = ", cost_ij
             train_loss_history.append(cost_ij.tolist())
             train_err_history.append(train_minibatch_error)
             iter_train_history.append(iter+1)
@@ -517,11 +518,11 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 if this_validation_loss < best_validation_loss:
 
                     #improve patience if loss improvement is good enough
-                    if this_validation_loss < best_validation_loss *  \
+                    if this_validation_loss < patience_loss *  \
                        improvement_threshold:
                         patience = max(patience, min((iter * patience_increase, max_patience_increase + iter)))
                         print "patience = ", patience, improvement_threshold, iter * patience_increase
-
+                        patience_loss = this_validation_loss
                     # save best validation score and iteration number
                     best_validation_loss = this_validation_loss
                     best_iter = iter
