@@ -1,0 +1,3 @@
+../../runs/RF_50000/RF_test_predictions_full.pkl;RF_pbbs;RF
+../../runs/tanh_1rot_adaplr_50k_buffer/test_predictions.pkl;ConvNet_pbbs;all images, 1 rot.
+../../runs/tanh_3rot_adaplr_50k/test_predictions.pkl;ConvNet_pbbs;all images, 3 rot.
