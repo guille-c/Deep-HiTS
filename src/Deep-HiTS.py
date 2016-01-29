@@ -156,7 +156,7 @@ def gradient_updates_momentum(cost, params, learning_rate, momentum):
 
 def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma = 0.5, momentum=0.9,
                      n_epochs= 10000,
-                     nkerns=[20, 50], n_hidden=200, batch_size=500,
+                     nkerns=[20, 50], n_hidden=200, batch_size=500, isDropout=False,
                      N_valid = 100000, N_test = 100000,
                      validate_every_batches = 100, n_rot = 3, activation = T.tanh,
                      tiny_train = False, buf_size=1000):
@@ -310,16 +310,13 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
 
 
     # #################DROPOUT############## 
-    drop_layer2 = DropoutLayer(layer2.output, p_drop=0.5)
-
-
-
-
-
-    
-    # classify the values of the fully-connected sigmoidal layer
-    layer3 = LogisticRegression(input=drop_layer2.output, n_in=n_hidden, n_out=2)
-
+    if isDropout:
+        drop_layer2 = DropoutLayer(layer2.output, p_drop=0.5)    
+        # classify the values of the fully-connected sigmoidal layer
+        layer3 = LogisticRegression(input=drop_layer2.output, n_in=n_hidden, n_out=2)
+    else:
+        layer3 = LogisticRegression(input=layer2.output, n_in=n_hidden, n_out=2)
+        
     # the cost we minimize during training is the NLL of the model
     cost = layer3.negative_log_likelihood(y)
 
@@ -726,6 +723,7 @@ if __name__ == '__main__':
                      validate_every_batches = int (c.get("vars",
                                                          "validate_every_batches")),
                      n_rot = int (c.get("vars", "n_rot")),
+                     isDropout = c.get("vars", "isDropout"),
                      activation = activation,
     		     tiny_train = tiny_train)
 
