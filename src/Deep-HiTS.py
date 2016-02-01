@@ -45,7 +45,7 @@ def relu(x):
 class LeNetConvPoolLayer(object):
     """Pool Layer of a convolutional network """
 
-    def __init__(self, rng, input, filter_shape, image_shape, poolsize=(2, 2), activation = T.tanh):
+    def __init__(self, rng, input, filter_shape, image_shape, poolsize=(2, 2), activation = T.tanh, poolstride=(2, 2)):
         """
         Allocate a LeNetConvPoolLayer with shared variable internal parameters.
 
@@ -97,13 +97,15 @@ class LeNetConvPoolLayer(object):
             input=input,
             filters=self.W,
             filter_shape=filter_shape,
-            image_shape=image_shape
+            image_shape=image_shape,
+            border_mode='full'
         )
 
         # downsample each feature map individually, using maxpooling
         pooled_out = downsample.max_pool_2d(
             input=conv_out,
             ds=poolsize,
+            st=poolstride,
             ignore_border=True
         )
 
@@ -263,15 +265,17 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     # 4D output tensor is thus of shape (batch_size, nkerns[0], 8, 8)
     filter_shape1 = 5 #8
     pool_size = 3 #2
+    pool_stride = 2
     layer0 = LeNetConvPoolLayer(
         rng,
         input=layer0_input,
         image_shape=(batch_size, im_chan, im_size, im_size),
         filter_shape=(nkerns[0], im_chan, filter_shape1, filter_shape1),
-        poolsize=(pool_size, pool_size)
+        poolsize=(pool_size, pool_size),
+        poolstride=(pool_stride, pool_stride)
     )
     print "layer0 = ", (nkerns[0], im_chan, filter_shape1, filter_shape1), (pool_size, pool_size)
-    maxpool_size1 = (im_size-filter_shape1 + 1)/pool_size
+    maxpool_size1 = (im_size+filter_shape1 - 1)/pool_stride
     print "maxpool_size1 = ", maxpool_size1
 
     # Construct the second convolutional pooling layer
@@ -280,12 +284,14 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     # 4D output tensor is thus of shape (batch_size, nkerns[1], 2, 2)
     filter_shape2 = 3 #6
     pool_size2 = 2
+    pool_stride2 = 2
     layer1 = LeNetConvPoolLayer(
         rng,
         input=layer0.output,
         image_shape=(batch_size, nkerns[0], maxpool_size1, maxpool_size1),
         filter_shape=(nkerns[1], nkerns[0], filter_shape2, filter_shape2),
-        poolsize=(pool_size2, pool_size2)
+        poolsize=(pool_size2, pool_size2),
+        poolstride=(pool_stride2, pool_stride2)
     )
 
     # the HiddenLayer being fully-connected, it operates on 2D matrices of
@@ -293,7 +299,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     # This will generate a matrix of shape (batch_size, nkerns[1] * 2 * 2),
     # or (500, 50 * 2 * 2) = (500, 200) with the default values.
     layer2_input = layer1.output.flatten(2)
-    maxpool_size2 = (maxpool_size1-filter_shape2 + 1)/pool_size2
+    maxpool_size2 = (maxpool_size1+filter_shape2 - 1)/pool_stride2
 
     # construct a fully-connected sigmoidal layer
     layer2 = HiddenLayer(
