@@ -320,7 +320,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
 
 
 
-    # #################DROPOUT############## 
+    # #################DROPOUT##############
     if isDropout:
         print "Dropout ON"
         drop_layer2 = DropoutLayer(layer2.output, p_drop=0.5)    
@@ -736,7 +736,7 @@ if __name__ == '__main__':
                      validate_every_batches = int (c.get("vars",
                                                          "validate_every_batches")),
                      n_rot = int (c.get("vars", "n_rot")),
-                     isDropout = c.get("vars", "isDropout"),
+                     isDropout = (c.get("vars", "isDropout")=="True"),
                      activation = activation,
     		     tiny_train = tiny_train)
 
