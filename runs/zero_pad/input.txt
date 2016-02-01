@@ -1,5 +1,5 @@
 [vars]
-path_to_chunks: /home/ireyes/chunks_feat_50000
+path_to_chunks: /home/shared/Fields_12-2015/chunks_feat_50000
 n_cand_chunk: 50000
 base_lr: 0.1
 gamma: 0.5
