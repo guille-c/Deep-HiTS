@@ -1,0 +1,406 @@
+Couldn't import dot_parser, loading of dot files will not be possible.
+nkerns =  [20 50] (2,)
+validation set =  100000
+... building the model
+layer0_input =  (50, 4, 21, 21)
+layer0 (filter)(pool)=  (20, 4, 5, 5) (3, 3)
+output =  6
+layer1 (filter)(pool) =  (50, 20, 3, 3) (2, 2)
+output=  2
+hidden layer inputs 200
+Hidden units:  50
+Dropout OFF
+... training
+--> train minibatch error =  0.52
+-->  0 50 chunk_10_50000.pkl
+--> train minibatch error =  0.28
+-->  0 100 chunk_10_50000.pkl
+--> train minibatch error =  0.52
+-->  0 150 chunk_10_50000.pkl
+--> train minibatch error =  0.52
+-->  0 200 chunk_10_50000.pkl
+--> train minibatch error =  0.54
+-->  0 250 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 350 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 400 chunk_10_50000.pkl
+--> train minibatch error =  0.32
+-->  0 450 chunk_10_50000.pkl
+--> train minibatch error =  0.38
+-->  0 500 chunk_10_50000.pkl
+--> train minibatch error =  0.56
+-->  0 550 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 600 chunk_10_50000.pkl
+--> train minibatch error =  0.5
+-->  0 650 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 700 chunk_10_50000.pkl
+--> train minibatch error =  0.3
+-->  0 750 chunk_10_50000.pkl
+--> train minibatch error =  0.34
+-->  0 850 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 900 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 950 chunk_10_50000.pkl
+--> train minibatch error =  0.36
+-->  0 1000 chunk_10_50000.pkl
+--> train minibatch error =  0.28
+-->  0 1050 chunk_10_50000.pkl
+--> train minibatch error =  0.46
+-->  0 1100 chunk_10_50000.pkl
+--> train minibatch error =  0.36
+-->  0 1150 chunk_10_50000.pkl
+--> train minibatch error =  0.36
+-->  0 1200 chunk_10_50000.pkl
+--> train minibatch error =  0.48
+-->  0 1250 chunk_10_50000.pkl
+--> train minibatch error =  0.34
+-->  0 1300 chunk_10_50000.pkl
+--> train minibatch error =  0.34
+-->  0 1400 chunk_10_50000.pkl
+--> train minibatch error =  0.42
+-->  0 1450 chunk_10_50000.pkl
+--> train minibatch error =  0.36
+-->  0 1500 chunk_10_50000.pkl
+--> train minibatch error =  0.34
+-->  0 1550 chunk_10_50000.pkl
+--> train minibatch error =  0.48
+-->  0 1600 chunk_10_50000.pkl
+--> train minibatch error =  0.52
+-->  0 1650 chunk_10_50000.pkl
+--> train minibatch error =  0.3
+-->  0 1700 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 1750 chunk_10_50000.pkl
+--> train minibatch error =  0.24
+-->  0 1800 chunk_10_50000.pkl
+--> train minibatch error =  0.24
+-->  0 1900 chunk_10_50000.pkl
+--> train minibatch error =  0.34
+-->  0 2000 chunk_10_50000.pkl
+--> train minibatch error =  0.38
+-->  0 2050 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 2100 chunk_10_50000.pkl
+--> train minibatch error =  0.42
+-->  0 2150 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 2200 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 2350 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 2400 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 2500 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 2600 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 2700 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 2750 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 2950 chunk_10_50000.pkl
+--> train minibatch error =  0.36
+-->  0 3000 chunk_10_50000.pkl
+--> train minibatch error =  0.36
+-->  0 3100 chunk_10_50000.pkl
+--> train minibatch error =  0.52
+-->  0 3150 chunk_10_50000.pkl
+--> train minibatch error =  0.32
+-->  0 3200 chunk_10_50000.pkl
+--> train minibatch error =  0.42
+-->  0 3300 chunk_10_50000.pkl
+--> train minibatch error =  0.24
+-->  0 3350 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 3450 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 3500 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 3550 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 3850 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 4000 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 4050 chunk_10_50000.pkl
+--> train minibatch error =  0.38
+-->  0 4100 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 4150 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 4550 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 4600 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 4650 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 4700 chunk_10_50000.pkl
+training @ iter =  100 , cost =  0.140389382839
+--> train minibatch error =  0.3
+-->  0 5250 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 5300 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 5450 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 5550 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 6450 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 6500 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 6550 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 6600 chunk_10_50000.pkl
+--> train minibatch error =  0.32
+-->  0 6800 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 7200 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 7250 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 7300 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 7400 chunk_10_50000.pkl
+--> train minibatch error =  0.32
+-->  0 7450 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 7500 chunk_10_50000.pkl
+--> train minibatch error =  0.36
+-->  0 7550 chunk_10_50000.pkl
+--> train minibatch error =  0.24
+-->  0 7850 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 8000 chunk_10_50000.pkl
+--> train minibatch error =  0.28
+-->  0 8050 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 8150 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 8250 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 8500 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 8600 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 8650 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 9500 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 9900 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 9950 chunk_10_50000.pkl
+training @ iter =  200 , cost =  0.181789174676
+--> train minibatch error =  0.12
+-->  0 11650 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 14450 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 14500 chunk_10_50000.pkl
+training @ iter =  300 , cost =  0.128243252635
+--> train minibatch error =  0.16
+-->  0 15500 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 15900 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 15950 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 16000 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 16050 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 16400 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 18400 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 18550 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 18600 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 18650 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 18750 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 19350 chunk_10_50000.pkl
+training @ iter =  400 , cost =  0.300704538822
+--> train minibatch error =  0.12
+-->  0 23950 chunk_10_50000.pkl
+training @ iter =  500 , cost =  0.0429049953818
+--> train minibatch error =  0.12
+-->  0 25450 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 26500 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 26850 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 26900 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 27500 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 28200 chunk_10_50000.pkl
+--> train minibatch error =  0.26
+-->  0 28250 chunk_10_50000.pkl
+--> train minibatch error =  0.16
+-->  0 28300 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 28900 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 29050 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 29100 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 29400 chunk_10_50000.pkl
+training @ iter =  600 , cost =  0.146330952644
+--> train minibatch error =  0.12
+-->  0 30750 chunk_10_50000.pkl
+--> train minibatch error =  0.24
+-->  0 31200 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 34750 chunk_10_50000.pkl
+--> train minibatch error =  0.12
+-->  0 34800 chunk_10_50000.pkl
+training @ iter =  700 , cost =  0.0477112196386
+--> train minibatch error =  0.18
+-->  0 35450 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 38100 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 38600 chunk_10_50000.pkl
+--> train minibatch error =  0.2
+-->  0 38700 chunk_10_50000.pkl
+training @ iter =  800 , cost =  0.0705495029688
+--> train minibatch error =  0.16
+-->  0 40650 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 43250 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 43300 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 43350 chunk_10_50000.pkl
+--> train minibatch error =  0.18
+-->  0 43850 chunk_10_50000.pkl
+--> train minibatch error =  0.22
+-->  0 43950 chunk_10_50000.pkl
+--> train minibatch error =  0.32
+-->  0 44000 chunk_10_50000.pkl
+training @ iter =  900 , cost =  0.114258825779
+--> train minibatch error =  0.18
+-->  0 46300 chunk_10_50000.pkl
+--> train minibatch error =  0.14
+-->  0 46400 chunk_10_50000.pkl
+training @ iter =  1000 , cost =  0.00862574018538
+--> train minibatch error =  0.24
+-->  1 750 chunk_11_50000.pkl
+--> train minibatch error =  0.12
+-->  1 4450 chunk_11_50000.pkl
+training @ iter =  1100 , cost =  0.0787882730365
+--> train minibatch error =  0.22
+-->  1 5450 chunk_11_50000.pkl
+--> train minibatch error =  0.28
+-->  1 5500 chunk_11_50000.pkl
+--> train minibatch error =  0.12
+-->  1 6350 chunk_11_50000.pkl
+--> train minibatch error =  0.12
+-->  1 7950 chunk_11_50000.pkl
+training @ iter =  1200 , cost =  0.0531117543578
+--> train minibatch error =  0.12
+-->  1 10250 chunk_11_50000.pkl
+--> train minibatch error =  0.12
+-->  1 10750 chunk_11_50000.pkl
+--> train minibatch error =  0.14
+-->  1 11000 chunk_11_50000.pkl
+training @ iter =  1300 , cost =  0.0640169382095
+training @ iter =  1400 , cost =  0.0138599537313
+training @ iter =  1500 , cost =  0.0739503055811
+--> train minibatch error =  0.12
+-->  1 26700 chunk_11_50000.pkl
+training @ iter =  1600 , cost =  0.0608436055481
+--> train minibatch error =  0.12
+-->  1 34250 chunk_11_50000.pkl
+training @ iter =  1700 , cost =  0.0122712003067
+--> train minibatch error =  0.12
+-->  1 35350 chunk_11_50000.pkl
+--> train minibatch error =  0.42
+-->  1 35450 chunk_11_50000.pkl
+--> train minibatch error =  0.18
+-->  1 39450 chunk_11_50000.pkl
+--> train minibatch error =  0.12
+-->  1 39500 chunk_11_50000.pkl
+--> train minibatch error =  0.16
+-->  1 39800 chunk_11_50000.pkl
+--> train minibatch error =  0.16
+-->  1 39900 chunk_11_50000.pkl
+training @ iter =  1800 , cost =  0.0472032576799
+training @ iter =  1900 , cost =  0.0403659716249
+iter  1999  validation
+epoch 1, iter 2000, validation error 1.752000 %
+epoch 1, iter 2000, train minibatch error 0.000000 %
+epoch 1, iter 2000, train buffer error 0.800000 %
+patience =  50000 0.99 3998
+FPR, FNR =  0.0211418860219 0.0139459517784
+training @ iter =  2000 , cost =  0.0105917789042
+--> train minibatch error =  0.14
+-->  2 3750 chunk_12_50000.pkl
+training @ iter =  2100 , cost =  0.0626309737563
+--> train minibatch error =  0.12
+-->  2 6450 chunk_12_50000.pkl
+--> train minibatch error =  0.18
+-->  2 6500 chunk_12_50000.pkl
+--> train minibatch error =  0.22
+-->  2 6550 chunk_12_50000.pkl
+--> train minibatch error =  0.12
+-->  2 6600 chunk_12_50000.pkl
+--> train minibatch error =  0.16
+-->  2 6650 chunk_12_50000.pkl
+--> train minibatch error =  0.16
+-->  2 7150 chunk_12_50000.pkl
+--> train minibatch error =  0.12
+-->  2 7200 chunk_12_50000.pkl
+--> train minibatch error =  0.12
+-->  2 9300 chunk_12_50000.pkl
+training @ iter =  2200 , cost =  0.0163237508386
+training @ iter =  2300 , cost =  0.00624720891938
+--> train minibatch error =  0.12
+-->  2 18750 chunk_12_50000.pkl
+training @ iter =  2400 , cost =  0.104885399342
+training @ iter =  2500 , cost =  0.0441094785929
+training @ iter =  2600 , cost =  0.0133782122284
+--> train minibatch error =  0.16
+-->  2 34850 chunk_12_50000.pkl
+training @ iter =  2700 , cost =  0.101274996996
+training @ iter =  2800 , cost =  0.0278214104474
+--> train minibatch error =  0.14
+-->  2 43000 chunk_12_50000.pkl
+training @ iter =  2900 , cost =  0.17165851593
+training @ iter =  3000 , cost =  0.208076059818
+--> train minibatch error =  0.12
+-->  3 3550 chunk_13_50000.pkl
+training @ iter =  3100 , cost =  0.0522577092052
+--> train minibatch error =  0.12
+-->  3 6650 chunk_13_50000.pkl
+training @ iter =  3200 , cost =  0.0732641592622
+--> train minibatch error =  0.2
+-->  3 10200 chunk_13_50000.pkl
+--> train minibatch error =  0.24
+-->  3 10250 chunk_13_50000.pkl
+--> train minibatch error =  0.46
+-->  3 10300 chunk_13_50000.pkl
+--> train minibatch error =  0.28
+-->  3 10350 chunk_13_50000.pkl
+--> train minibatch error =  0.12
+-->  3 10650 chunk_13_50000.pkl
+training @ iter =  3300 , cost =  0.0436452850699
+--> train minibatch error =  0.14
+-->  3 16450 chunk_13_50000.pkl
+--> train minibatch error =  0.16
+-->  3 18350 chunk_13_50000.pkl
+--> train minibatch error =  0.16
+-->  3 18400 chunk_13_50000.pkl
+--> train minibatch error =  0.26
+-->  3 18450 chunk_13_50000.pkl
+--> train minibatch error =  0.12
+-->  3 18500 chunk_13_50000.pkl
