@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import pylab as pl
-from sklearn.metrics import auc, roc_curve, precision_recall_fscore_support
+from sklearn.metrics import auc, roc_curve, precision_recall_fscore_support, accuracy_score
 from sklearn.metrics.classification import _check_targets
 #precision_recall_curve, average_precision_score
 
@@ -13,6 +13,8 @@ matplotlib.rc('font', **font)
 in_file = open(sys.argv[1])
 
 pl.clf()
+ls = [":", "--", "-", "-."]
+i = 0
 for line in in_file:
     fn, pred_name, lab = line.split(";")
     
@@ -26,10 +28,13 @@ for line in in_file:
     auc_ = auc(fpr, tpr)
 
     #pl.plot (1-rec_RF, 1-prec_RF, label = ", AUC = {0:0.2f}".format(av_RF))
-    pl.plot (fpr, 1-tpr, label = lab[:-1] + ", AUC = {0:0.3f}".format(auc_))
+    #pl.plot (fpr, 1-tpr, label = lab[:-1] + ", AUC = {0:0.3f}".format(auc_))
+    pl.plot (fpr, 1-tpr, label = lab[:-1], ls = ls[i], c = "k")
 
-    prec, rec, f1, supp = precision_recall_fscore_support(y, (pred > 0.5), average='binary')
-    print lab[:-1], " & ", np.round(prec, 4), " & ", np.round(rec, 4), " & ", np.round(f1, 4), "\\\\"
+    prec, rec, f1, supp = precision_recall_fscore_support(y, (pred >= 0.5), average='binary')
+    acc = accuracy_score (y, (pred >= 0.5))
+    print lab[:-1], " & ", np.round(acc, 4), " & ", np.round(prec, 4), " & ", np.round(rec, 4), " & ", np.round(f1, 4), "\\\\"
+    i += 1
     
 pl.xlabel("FPR")
 pl.ylabel("FNR")

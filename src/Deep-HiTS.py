@@ -159,7 +159,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                      nkerns=[20, 50], batch_size=500,
                      N_valid = 100000, N_test = 100000,
                      validate_every_batches = 100, n_rot = 3, activation = T.tanh,
-                     tiny_train = False, buf_size=1000):
+                     tiny_train = False, buf_size=5000):
     """ Demonstrates lenet on MNIST dataset
 
     :type learning_rate: float
@@ -486,12 +486,12 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 print('epoch %i, iter %i, train minibatch error %f %%' %
                       (epoch, iter + 1,
                        train_minibatch_error * 100.))
-                
                 # Error calculation for the training buffer
                 if not tiny_train:
                     buf_train_set_x.set_value(local_buf_x)
                     buf_train_set_y.set_value(local_buf_y)
                     buffer_errors = [train_buffer_error(i) for i in xrange(buf_size/batch_size)]
+                    print buffer_errors
                     train_buf_err = numpy.mean(buffer_errors)
                     train_buf_err_history.append(train_buf_err)
                     print('epoch %i, iter %i, train buffer error %f %%' %

@@ -28,7 +28,7 @@ for i in range(len(snr_thresholds)):
 
     print y_test.shape, RF_test.shape, crit.sum()
     fpr, tpr, _ = roc_curve(y_test, RF_test)
-    pl.plot(fpr, 1.-tpr, label = "RF SNR < " + str(snrt) + ', AUC = ' + str(np.round(auc(fpr, tpr), 3)), ls = "--", color = colors[i])
+    pl.plot(fpr, 1.-tpr, label = "RF SNR < " + str(snrt) + ', AUC = ' + str(np.round(1-auc(fpr, tpr), 3)), ls = "--", color = colors[i], lw = (3-i))
     
     crit = (np.abs(pkl_CNN['SNRs']) < snrt)
     y_test = pkl_CNN['labels'][crit]
@@ -36,10 +36,10 @@ for i in range(len(snr_thresholds)):
 
     print y_test.shape, CNN_test.shape, crit.sum()
     fpr, tpr, _ = roc_curve(y_test, CNN_test)
-    pl.plot(fpr, 1.-tpr, label = "CNN SNR < " + str(snrt) + ', AUC = ' + str(np.round(auc(fpr, tpr), 3)), ls = "-", color = colors[i])
+    pl.plot(fpr, 1.-tpr, label = "ConvNet-4 SNR < " + str(snrt) + ', AUC = ' + str(np.round(1-auc(fpr, tpr), 3)), ls = "-", color = colors[i], lw = (3-i))
 
 
-pl.legend(loc="best")
+pl.legend(loc="best", fontsize = "medium")
 pl.xscale("log")
 pl.yscale("log")
 pl.xlabel("FPR")
