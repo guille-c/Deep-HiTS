@@ -83,7 +83,7 @@ class ChunkLoader():
 	return train_set
 	    
 if __name__=="__main__":
-    c = ChunkLoader('/home/ireyes/chunks_feat/chunks_test/')
+    c = ChunkLoader('/home/ireyes/chunks_feat_50000/chunks_train/', 50000, 50, n_rot=0)
     n_epochs = 3
     for e in np.arange(n_epochs):
         print "e = ", e

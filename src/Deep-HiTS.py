@@ -33,7 +33,7 @@ from theano.tensor.signal import downsample
 from theano.tensor.nnet import conv
 
 from logistic_sgd import LogisticRegression, load_data
-from mlp import HiddenLayer
+from mlp import HiddenLayer, DropoutLayer
 from loadHITS import *
 from ChunkLoader import *
 
@@ -45,7 +45,7 @@ def relu(x):
 class LeNetConvPoolLayer(object):
     """Pool Layer of a convolutional network """
 
-    def __init__(self, rng, input, filter_shape, image_shape, poolsize=(2, 2), activation = T.tanh):
+    def __init__(self, rng, input, filter_shape, image_shape, poolsize=(2, 2), activation = T.tanh, poolstride=(2, 2)):
         """
         Allocate a LeNetConvPoolLayer with shared variable internal parameters.
 
@@ -97,13 +97,15 @@ class LeNetConvPoolLayer(object):
             input=input,
             filters=self.W,
             filter_shape=filter_shape,
-            image_shape=image_shape
+            image_shape=image_shape,
+            border_mode='full'
         )
 
         # downsample each feature map individually, using maxpooling
         pooled_out = downsample.max_pool_2d(
             input=conv_out,
             ds=poolsize,
+            st=poolstride,
             ignore_border=True
         )
 
@@ -156,7 +158,7 @@ def gradient_updates_momentum(cost, params, learning_rate, momentum):
 
 def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma = 0.5, momentum=0.9,
                      n_epochs= 10000,
-                     nkerns=[20, 50], batch_size=500,
+                     nkerns=[20, 50], n_hidden=200, batch_size=500, isDropout=False,
                      N_valid = 100000, N_test = 100000,
                      validate_every_batches = 100, n_rot = 3, activation = T.tanh,
                      tiny_train = False, buf_size=5000):
@@ -261,18 +263,20 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     # filtering reduces the image size to (21-6+1 , 21-6+1) = (16, 16)
     # maxpooling reduces this further to (16/2, 16/2) = (8, 8)
     # 4D output tensor is thus of shape (batch_size, nkerns[0], 8, 8)
-    filter_shape1 = 5 #8
-    pool_size = 3 #2
+    filter_shape1 = 4 #8
+    pool_size = 2
+    pool_stride = 2
     layer0 = LeNetConvPoolLayer(
         rng,
         input=layer0_input,
         image_shape=(batch_size, im_chan, im_size, im_size),
         filter_shape=(nkerns[0], im_chan, filter_shape1, filter_shape1),
-        poolsize=(pool_size, pool_size)
+        poolsize=(pool_size, pool_size),
+        poolstride=(pool_stride, pool_stride)
     )
-    print "layer0 = ", (nkerns[0], im_chan, filter_shape1, filter_shape1), (pool_size, pool_size)
-    maxpool_size1 = (im_size-filter_shape1 + 1)/pool_size
-    print "maxpool_size1 = ", maxpool_size1
+    print "layer0 (filter)(pool)= ", (nkerns[0], im_chan, filter_shape1, filter_shape1), (pool_size, pool_size)
+    maxpool_size1 = (im_size+filter_shape1 - 1)/pool_stride
+    print "output = ", maxpool_size1
 
     # Construct the second convolutional pooling layer
     # filtering reduces the image size to (8-5+1, 8-5+1) = (4, 4)
@@ -280,35 +284,52 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     # 4D output tensor is thus of shape (batch_size, nkerns[1], 2, 2)
     filter_shape2 = 3 #6
     pool_size2 = 2
+    pool_stride2 = 2
     layer1 = LeNetConvPoolLayer(
         rng,
         input=layer0.output,
         image_shape=(batch_size, nkerns[0], maxpool_size1, maxpool_size1),
         filter_shape=(nkerns[1], nkerns[0], filter_shape2, filter_shape2),
-        poolsize=(pool_size2, pool_size2)
+        poolsize=(pool_size2, pool_size2),
+        poolstride=(pool_stride2, pool_stride2)
     )
 
+    print "layer1 (filter)(pool) = ", (nkerns[1], nkerns[0], filter_shape2, filter_shape2), (pool_size2, pool_size2)
+    
     # the HiddenLayer being fully-connected, it operates on 2D matrices of
     # shape (batch_size, num_pixels) (i.e matrix of rasterized images).
     # This will generate a matrix of shape (batch_size, nkerns[1] * 2 * 2),
     # or (500, 50 * 2 * 2) = (500, 200) with the default values.
     layer2_input = layer1.output.flatten(2)
-    maxpool_size2 = (maxpool_size1-filter_shape2 + 1)/pool_size2
+    maxpool_size2 = (maxpool_size1+filter_shape2 - 1)/pool_stride2
+
+    print "output= ", maxpool_size2
 
     # construct a fully-connected sigmoidal layer
     layer2 = HiddenLayer(
         rng,
         input=layer2_input,
         n_in=nkerns[1] * maxpool_size2 * maxpool_size2,
-        n_out=batch_size,
+        n_out=n_hidden,
         activation=activation
         #activation=T.tanh
         #activation=relu
     )
+    print "Hidden units: ", n_hidden
 
-    # classify the values of the fully-connected sigmoidal layer
-    layer3 = LogisticRegression(input=layer2.output, n_in=batch_size, n_out=2)
 
+
+
+    # #################DROPOUT##############
+    if isDropout:
+        print "Dropout ON"
+        drop_layer2 = DropoutLayer(layer2.output, p_drop=0.5)    
+        # classify the values of the fully-connected sigmoidal layer
+        layer3 = LogisticRegression(input=drop_layer2.output, n_in=n_hidden, n_out=2)
+    else:
+        print "Dropout OFF"
+        layer3 = LogisticRegression(input=layer2.output, n_in=n_hidden, n_out=2)
+        
     # the cost we minimize during training is the NLL of the model
     cost = layer3.negative_log_likelihood(y)
 
@@ -401,6 +422,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                                   # check every epoch
 
     best_validation_loss = numpy.inf
+    patience_loss = numpy.inf
     best_iter = 0
     test_score = 0.
     start_time = time.clock()
@@ -424,6 +446,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     buf_index = 0
     train_buf_err_history = []
     # Maximum number of epochs = n_epochs
+
+    DropoutLayer.activate()
     while (epoch < n_epochs) and (not done_looping):
         epoch = epoch + 1
         #for minibatch_index in xrange(n_train_batches):
@@ -433,8 +457,6 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
             #iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
             #print 'DEBUGGING', iter
             sys.stdout.flush()
-            if iter % 100 == 0:
-                print 'training @ iter = ', iter
 
             if tiny_train:
                 iter = (epoch - 1) * n_train_batches + minibatch_index
@@ -454,9 +476,13 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 buf_index = (buf_index+batch_size)%buf_size
                 
                 cost_ij = train_model(0, learning_rate)
+                DropoutLayer.deactivate()
                 train_minibatch_error = test_model_train(0)
+                DropoutLayer.activate()
                 epoch_done = chunkLoader.done
 
+            if iter % 100 == 0:
+                print 'training @ iter = ', iter, ", cost = ", cost_ij
             train_loss_history.append(cost_ij.tolist())
             train_err_history.append(train_minibatch_error)
             iter_train_history.append(iter+1)
@@ -473,6 +499,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
 
 	    #VALIDATION
             if (iter + 1) % validation_frequency == 0:
+                DropoutLayer.deactivate()
                 print "iter ", iter, " validation"
                 # compute zero-one loss on validation set
                 validation_losses = [validate_model(i) for i
@@ -501,11 +528,11 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                 if this_validation_loss < best_validation_loss:
 
                     #improve patience if loss improvement is good enough
-                    if this_validation_loss < best_validation_loss *  \
+                    if this_validation_loss < patience_loss *  \
                        improvement_threshold:
                         patience = max(patience, min((iter * patience_increase, max_patience_increase + iter)))
                         print "patience = ", patience, improvement_threshold, iter * patience_increase
-
+                        patience_loss = this_validation_loss
                     # save best validation score and iteration number
                     best_validation_loss = this_validation_loss
                     best_iter = iter
@@ -547,6 +574,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                     times.append(time.clock()-start_time)
                     FPRs.append(FPR)
                     FNRs.append(FNR)
+                DropoutLayer.activate()
 
             if patience <= iter:
                 done_looping = True
@@ -619,6 +647,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     )
 
     ############## TESTING #############
+    DropoutLayer.deactivate()
+    
     params = best_params
     test_pred = np.array([predict (i)
                           for i in xrange(n_test_batches)])
@@ -698,6 +728,7 @@ if __name__ == '__main__':
                      n_epochs = int (c.get("vars", "n_epochs")),
                      #nkerns=[20, 50],
                      nkerns = np.array(c.get("vars", "nkerns").split (","), dtype = int),
+                     n_hidden = int(c.get("vars", "n_hidden")),
                      batch_size = int (c.get("vars", "batch_size")),
                      N_valid = int (c.get("vars", "N_valid")),
                      N_test = int (c.get("vars", "N_test")),
@@ -705,6 +736,7 @@ if __name__ == '__main__':
                      validate_every_batches = int (c.get("vars",
                                                          "validate_every_batches")),
                      n_rot = int (c.get("vars", "n_rot")),
+                     isDropout = (c.get("vars", "isDropout")=="True"),
                      activation = activation,
     		     tiny_train = tiny_train)
 
