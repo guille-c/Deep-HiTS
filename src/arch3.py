@@ -41,6 +41,8 @@ from ConfigParser import ConfigParser
 
 def relu(x):
     return T.switch(x<0, 0, x)
+def prelu(x):
+    return T.switch(x<0, 0.01*x, x)
     
 class LeNetConvPoolLayer(object):
     """Pool Layer of a convolutional network """
@@ -266,6 +268,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     layer0 = LeNetConvPoolLayer(
         rng,
         input=layer0_input,
+        activation=activation,
         image_shape=(batch_size, im_chan, im_size, im_size),
         filter_shape=(nkerns[0], im_chan, filter_shape1, filter_shape1),
         poolsize=(pool_size, pool_size),
@@ -282,6 +285,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     layer1 = LeNetConvPoolLayer(
         rng,
         input=layer0.output,
+        activation=activation,
         image_shape=(batch_size, nkerns[0], maxpool_size1, maxpool_size1),
         filter_shape=(nkerns[1], nkerns[0], filter_shape2, filter_shape2),
         poolsize=(pool_size2, pool_size2),
@@ -299,6 +303,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     layer2 = LeNetConvPoolLayer(
         rng,
         input=layer1.output,
+        activation=activation,
         image_shape=(batch_size, nkerns[1], maxpool_size2, maxpool_size2),
         filter_shape=(nkerns[2], nkerns[1], filter_shape3, filter_shape3),
         poolsize=(pool_size3, pool_size3),
@@ -728,6 +733,8 @@ if __name__ == '__main__':
         activation = T.tanh
     elif c.get("vars", "activation_function") == "ReLU":
         activation = relu
+    elif c.get("vars", "activation_function") == "PReLU":
+        activation = prelu
 
     tiny_train = c.get("vars", "tiny_train")
     if tiny_train == "False":
