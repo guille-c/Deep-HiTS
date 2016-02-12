@@ -10,12 +10,14 @@ e_tr = np.array(train['train_buf_err_history'])
 
 i_val = valid['iter_val_history']
 e_val = valid['val_err_history']
+l_val = valid['val_loss_history']
 
 pl.clf()
 #pl.plot (i_tr[crit], e_tr[crit], label = "Training set")
-pl.plot (i_tr, e_tr, label = "Training set")
-pl.plot (i_val, e_val, label = "Validation set")
-pl.ylim([0, 0.02])
+#pl.plot (i_tr, e_tr, label = "Training set")
+pl.plot (i_val, e_val, label = "Validation set error")
+pl.plot (i_val, l_val, label = "Validation set loss")
+pl.ylim([0, 0.06])
 pl.show()
 #pl.savefig (sys.argv[1] + "/learning_history")
 
