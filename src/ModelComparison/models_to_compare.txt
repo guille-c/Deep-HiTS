@@ -1,2 +1,3 @@
-../../runs/arch5_low_lr_2/test_predictions.pkl;ConvNet_pbbs;ConvNet
+../../runs/arch5_low_lr_2/test_predictions.pkl;ConvNet_pbbs;ConvNet, 4 images
+../../runs/arch5_low_lr_2_diff/test_predictions.pkl;ConvNet_pbbs;ConvNet, SNR difference
 /home/shared/Fields_12-2015/RF_test_predictions_full.pkl;RF_pbbs;Random Forest
