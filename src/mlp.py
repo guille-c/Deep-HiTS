@@ -133,7 +133,10 @@ class HiddenLayer(object):
         )
         # parameters of the model
         self.params = [self.W, self.b]
-
+    def load_params(self, W, b):
+        self.W.set_value(W)
+        self.b.set_value(b)
+        print 'Hidden Layer parameters loaded'
 
 # start-snippet-2
 class MLP(object):

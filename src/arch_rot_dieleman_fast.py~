@@ -20,6 +20,7 @@ References:
    Recognition, Proceedings of the IEEE, 86(11):2278-2324, November 1998.
    http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf
 
+
 """
 import os
 import sys
@@ -49,9 +50,7 @@ def prelu(x):
 class LeNetConvPoolLayer(object):
     """Pool Layer of a convolutional network """
 
-    def __init__(self, rng, input, filter_shape, image_shape,
-                 poolsize=(2, 2), activation = T.tanh, poolstride=(2, 2),
-                 W=None, b=None):
+    def __init__(self, rng, input, filter_shape, image_shape, poolsize=(2, 2), activation = T.tanh, poolstride=(2, 2)):
         """
         Allocate a LeNetConvPoolLayer with shared variable internal parameters.
 
@@ -76,34 +75,28 @@ class LeNetConvPoolLayer(object):
         assert image_shape[1] == filter_shape[1]
         self.input = input
 
-        if W==None:
-            # there are "num input feature maps * filter height * filter width"
-            # inputs to each hidden unit
-            fan_in = numpy.prod(filter_shape[1:])
-            # each unit in the lower layer receives a gradient from:
-            # "num output feature maps * filter height * filter width" /
-            #   pooling size
-            fan_out = (filter_shape[0] * numpy.prod(filter_shape[2:]) /
-                       numpy.prod(poolsize))
-            # initialize weights with random weights
-            W_bound = numpy.sqrt(6. / (fan_in + fan_out))
-            self.W = theano.shared(
-                numpy.asarray(
-                    rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
-                    dtype=theano.config.floatX
-                ),
-                borrow=True
-            )
-        else:
-            self.W = W
+        # there are "num input feature maps * filter height * filter width"
+        # inputs to each hidden unit
+        fan_in = numpy.prod(filter_shape[1:])
+        # each unit in the lower layer receives a gradient from:
+        # "num output feature maps * filter height * filter width" /
+        #   pooling size
+        fan_out = (filter_shape[0] * numpy.prod(filter_shape[2:]) /
+                   numpy.prod(poolsize))
+        # initialize weights with random weights
+        W_bound = numpy.sqrt(6. / (fan_in + fan_out))
+        self.W = theano.shared(
+            numpy.asarray(
+                rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
+                dtype=theano.config.floatX
+            ),
+            borrow=True
+        )
 
-        if b==None:
-            # the bias is a 1D tensor -- one bias per output feature map
-            b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
-            self.b = theano.shared(value=b_values, borrow=True)
-        else:
-            self.b = b
-            
+        # the bias is a 1D tensor -- one bias per output feature map
+        b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
+        self.b = theano.shared(value=b_values, borrow=True)
+
         # convolve input feature maps with filters
         conv_out = conv.conv2d(
             input=input,
@@ -168,181 +161,6 @@ def gradient_updates_momentum(cost, params, learning_rate, momentum):
         updates.append((param_update, momentum*param_update + (1. - momentum)*T.grad(cost, param)))
     return updates
 
-#class ConvNet():
-#    def __init__(self, data_path, nkerns=[32, 64, 64, 64], batch_size=50,
-#                 isDropout=True, activation=T.tanh, params=[None]*10):
-#        print "nkerns = ", nkerns, nkerns.shape
-#
-#        rng = numpy.random.RandomState(23455)
-#        im_chan = 4# temp, sci, diff, snr_diff
-#        
-#        # Creation of validation and test sets
-#        self.train_set_x, self.train_set_y = shared_dataset((np.ones((1, 441*im_chan)), np.ones(1)))
-#        
-#        assert buf_size%batch_size==0
-#        assert buf_size>batch_size
-#        self.buf_train_set_x, self.buf_train_set_y = shared_dataset((np.ones((buf_size,441*im_chan)), np.ones(buf_size)))
-#        self.local_buf_x = self.buf_train_set_x.get_value()
-#        self.local_buf_y = self.buf_train_set_y.get_value()
-#        chunkLoader = ChunkLoader(data_path + '/chunks_validate/',
-#                                  n_cand_chunk, n_cand_chunk, n_rot = n_rot)
-#
-#        v_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
-#        v_y = np.array([], dtype = "int32")
-#        while (len(v_y) < N_test):
-#            v_x1, v_y1 = chunkLoader.getNext()
-#            v_x = np.vstack((v_x, v_x1))
-#            v_y = np.concatenate((v_y, v_y1))
-#            
-#        print "validation set = ", len(v_y)
-#        self.valid_set_x, self.valid_set_y = shared_dataset ([v_x, v_y])
-#            
-#
-#        self.chunkLoader = ChunkLoader(data_path + '/chunks_train/',
-#                                  n_cand_chunk, batch_size, n_rot = n_rot)
-#    
-#        #if tiny_train:
-#        #    tr_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
-#        #    tr_y = np.array([], dtype = "int32")
-#        #    while (len(tr_y) < tiny_train):
-#        #        tr_x1, tr_y1 = chunkLoader.getNext()
-#        #        tr_x = np.vstack((tr_x, tr_x1))
-#        #        tr_y = np.concatenate((tr_y, tr_y1))
-#        #
-#        #        print "training set = ", len(tr_y)
-#        #        train_set_x, train_set_y = shared_dataset ([tr_x, tr_y])
-#        #        
-#        #        n_train_batches = train_set_x.get_value(borrow=True).shape[0]
-#        #        n_train_batches /= batch_size
-#
-#        n_valid_batches = N_valid / batch_size
-#    
-#        # allocate symbolic variables for the data
-#        self.index = T.lscalar()  # index to a [mini]batch
-#        self.lr = T.fscalar() # learning rate symbolic variable
-#    
-#        # start-snippet-1
-#        self.x = T.matrix('x')   # the data is presented as rasterized images
-#        self.y = T.ivector('y')  # the labels are presented as 1D vector of
-#                        # [int] labels
-#
-#        ######################
-#        # BUILD ACTUAL MODEL #
-#        ######################
-#        print '... building the model'
-#
-#        im_size = 21
-#        self.layer0_input = self.x.reshape((batch_size, im_chan, im_size, im_size))
-#        print "layer0_input = ", (batch_size, im_chan, im_size, im_size)
-#
-#        # First ConvPool Layer
-#        filter_shape1 = 4 #8
-#        pool_size = 2
-#        pool_stride = 2
-#        self.layer0 = LeNetConvPoolLayer(
-#            rng,
-#            input=self.layer0_input,
-#            activation=activation,
-#            image_shape=(batch_size, im_chan, im_size, im_size),
-#            filter_shape=(nkerns[0], im_chan, filter_shape1, filter_shape1),
-#            poolsize=(pool_size, pool_size),
-#            poolstride=(pool_stride, pool_stride),
-#            W=params[0],
-#            b=params[1]
-#        )
-#        print "layer0 (filter)(pool)= ", (nkerns[0], im_chan, filter_shape1, filter_shape1), (pool_size, pool_size)
-#        maxpool_size1 = int(math.ceil(1.0*(im_size+filter_shape1 - 1)/pool_stride))
-#        print "output = ", maxpool_size1
-#
-#        # Second ConvPool Layer (without pooling)
-#        filter_shape2 = 3 #6
-#        pool_size2 = 1
-#        pool_stride2 = 1
-#        self.layer1 = LeNetConvPoolLayer(
-#            rng,
-#            input=self.layer0.output,
-#            activation=activation,
-#            image_shape=(batch_size, nkerns[0], maxpool_size1, maxpool_size1),
-#            filter_shape=(nkerns[1], nkerns[0], filter_shape2, filter_shape2),
-#            poolsize=(pool_size2, pool_size2),
-#            poolstride=(pool_stride2, pool_stride2),
-#            W=params[2],
-#            b=params[3]
-#        )
-#
-#        print "layer1 (filter)(pool) = ", (nkerns[1], nkerns[0], filter_shape2, filter_shape2), (pool_size2, pool_size2)
-#        maxpool_size2 = int(math.ceil(1.0*(maxpool_size1+filter_shape2 - 1)/pool_stride2))
-#        print "output= ", maxpool_size2
-#
-#        # Third ConvPool Layer
-#        filter_shape3 = 3
-#        pool_size3 = 2
-#        pool_stride3 = 2
-#        self.layer2 = LeNetConvPoolLayer(
-#            rng,
-#            input=self.layer1.output,
-#            activation=activation,
-#            image_shape=(batch_size, nkerns[1], maxpool_size2, maxpool_size2),
-#            filter_shape=(nkerns[2], nkerns[1], filter_shape3, filter_shape3),
-#            poolsize=(pool_size3, pool_size3),
-#            poolstride=(pool_stride3, pool_stride3),
-#            W=params[4],
-#            b=params[5]
-#        )
-#        
-#        print "layer2 (filter)(pool) = ", (nkerns[2], nkerns[1], filter_shape3, filter_shape3), (pool_size3, pool_size3)
-#        self.layer3_input = self.layer2.output.flatten(2)
-#        maxpool_size3 = int(math.ceil(1.0*(maxpool_size2+filter_shape3 - 1)/pool_stride3))
-#        print "output= ", maxpool_size3
-#
-#        # construct a fully-connected layer
-#        self.layer3 = HiddenLayer(
-#            rng,
-#            input=layer3_input,
-#            n_in=nkerns[2] * maxpool_size3 * maxpool_size3,
-#            n_out=nkerns[3],
-#            activation=activation,
-#            W=params[6],
-#            b=params[7]
-#        )
-#        print "Hidden units: ", nkerns[3]
-#
-#
-#        # #################DROPOUT##############
-#        if isDropout:
-#            print "Dropout ON"
-#            drop_layer3 = DropoutLayer(layer3.output, p_drop=0.5)    
-#            # classify the values of the fully-connected sigmoidal layer
-#            layer4 = LogisticRegression(input=drop_layer3.output,
-#                                        n_in=nkerns[3],
-#                                        n_out=2,
-#                                        W=params[8],
-#                                        b=params[9]
-#            )
-#        else:
-#            print "Dropout OFF"
-#            layer4 = LogisticRegression(input=layer3.output,
-#                                        n_in=nkerns[3],
-#                                        n_out=2,
-#                                        W=params[8],
-#                                        b=params[9]
-#            )
-#        
-#        # the cost we minimize during training is the NLL of the model
-#        cost = layer4.negative_log_likelihood(y)
-#
-#        # create a list of all model parameters to be fit by gradient descent
-#        params = layer0.params + layer1.params + layer2.params + layer3.params + layer4.params
-#        #params = layer4.params + layer3.params + layer2.params + layer1.params + layer0.params
-#
-#        # create a list of gradients for all model parameters
-#        grads = T.grad(cost, params)
-#
-#        learning_rate = base_lr
-#
-#    def train(self):
-#        
-
 def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma = 0.5, momentum=0.0,
                      n_epochs= 10000,
                      nkerns=[16, 32, 32, 512, 512], batch_size=50, isDropout=False,
@@ -373,11 +191,11 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     # Creation of validation and test sets
     train_set_x, train_set_y = shared_dataset((np.ones((1, 441*im_chan)), np.ones(1)))
 
-    assert buf_size%batch_size==0
-    assert buf_size>batch_size
-    buf_train_set_x, buf_train_set_y = shared_dataset((np.ones((buf_size,441*im_chan)), np.ones(buf_size)))
-    local_buf_x = buf_train_set_x.get_value()
-    local_buf_y = buf_train_set_y.get_value()
+#    assert buf_size%batch_size==0
+#    assert buf_size>batch_size
+#    buf_train_set_x, buf_train_set_y = shared_dataset((np.ones((buf_size,441*im_chan)), np.ones(buf_size)))
+#    local_buf_x = buf_train_set_x.get_value()
+#    local_buf_y = buf_train_set_y.get_value()
     chunkLoader = ChunkLoader(data_path + '/chunks_validate/',
                               n_cand_chunk, n_cand_chunk, n_rot = n_rot)
 
@@ -393,7 +211,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
 
 
     chunkLoader = ChunkLoader(data_path + '/chunks_train/',
-                              n_cand_chunk, batch_size, n_rot = n_rot)
+                              n_cand_chunk, n_cand_chunk, n_rot = n_rot)
     
     if tiny_train:
         tr_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
@@ -443,8 +261,18 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     # to a 4D tensor, compatible with our LeNetConvPoolLayer
     # (21, 21) is the size of MNIST images.
     im_size = 21
-    layer0_input = x.reshape((batch_size, im_chan, im_size, im_size))
-    print "layer0_input = ", (batch_size, im_chan, im_size, im_size)
+    input_data = x.reshape((batch_size, im_chan, im_size, im_size))
+    print "input_data", (batch_size, im_chan, im_size, im_size)
+
+
+    # Create 90 degrees rotations following Dieleman's strategy
+    new_batch_size = batch_size*4
+    part0 = input_data
+    part1 = input_data[:,:,:,:-im_size-1:-1].dimshuffle(0,1,3,2) # 90 degrees
+    part2 = input_data[:,:,:-im_size-1:-1,:-im_size-1:-1] # 180 degrees
+    part3 = input_data[:,:,:-im_size-1:-1,:].dimshuffle(0,1,3,2) # 270 degrees
+
+    layer0_input = T.concatenate([part0, part1, part2, part3], axis=0)
 
     # First ConvPool Layer
     filter_shape1 = 4 #8
@@ -454,7 +282,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
         rng,
         input=layer0_input,
         activation=activation,
-        image_shape=(batch_size, im_chan, im_size, im_size),
+        image_shape=(new_batch_size, im_chan, im_size, im_size),
         filter_shape=(nkerns[0], im_chan, filter_shape1, filter_shape1),
         poolsize=(pool_size, pool_size),
         poolstride=(pool_stride, pool_stride)
@@ -471,7 +299,7 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
         rng,
         input=layer0.output,
         activation=activation,
-        image_shape=(batch_size, nkerns[0], maxpool_size1, maxpool_size1),
+        image_shape=(new_batch_size, nkerns[0], maxpool_size1, maxpool_size1),
         filter_shape=(nkerns[1], nkerns[0], filter_shape2, filter_shape2),
         poolsize=(pool_size2, pool_size2),
         poolstride=(pool_stride2, pool_stride2)
@@ -489,22 +317,26 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
         rng,
         input=layer1.output,
         activation=activation,
-        image_shape=(batch_size, nkerns[1], maxpool_size2, maxpool_size2),
+        image_shape=(new_batch_size, nkerns[1], maxpool_size2, maxpool_size2),
         filter_shape=(nkerns[2], nkerns[1], filter_shape3, filter_shape3),
         poolsize=(pool_size3, pool_size3),
         poolstride=(pool_stride3, pool_stride3)
     )
 
     print "layer2 (filter)(pool) = ", (nkerns[2], nkerns[1], filter_shape3, filter_shape3), (pool_size3, pool_size3)
-    layer3_input = layer2.output.flatten(2)
+
     maxpool_size3 = int(math.ceil(1.0*(maxpool_size2+filter_shape3 - 1)/pool_stride3))
     print "output= ", maxpool_size3
+    
+    # Recover structure (Dieleman's trick) 
+    layer2_out_aux = layer2.output.reshape((4, batch_size, nkerns[2] * maxpool_size3 * maxpool_size3))
+    layer3_input = layer2_out_aux.transpose(1,0,2).reshape((batch_size, 4*nkerns[2] * maxpool_size3 * maxpool_size3))
 
     # construct a fully-connected layer
     layer3 = HiddenLayer(
         rng,
         input=layer3_input,
-        n_in=nkerns[2] * maxpool_size3 * maxpool_size3,
+        n_in=4*nkerns[2] * maxpool_size3 * maxpool_size3,
         n_out=nkerns[3],
         activation=activation
         #activation=T.tanh
@@ -596,15 +428,15 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
             y: train_set_y[index * batch_size: (index + 1) * batch_size]
         }
     )
-    train_buffer_error = theano.function(
-        [index],
-        layer4.errors(y),
-        givens={
-            x: buf_train_set_x[index * batch_size: (index + 1) * batch_size],
-            y: buf_train_set_y[index * batch_size: (index + 1) * batch_size]
-        }
-    )
-    # end-snippet-1
+#    train_buffer_error = theano.function(
+#        [index],
+#        layer4.errors(y),
+#        givens={
+#            x: buf_train_set_x[index * batch_size: (index + 1) * batch_size],
+#            y: buf_train_set_y[index * batch_size: (index + 1) * batch_size]
+#        }
+#    )
+#    # end-snippet-1
 
     ###############
     # TRAIN MODEL #
@@ -646,8 +478,8 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
     iter_val_history = []
     best_params = params
     iter = 0
-    buf_index = 0
-    train_buf_err_history = []
+    #buf_index = 0
+    #train_buf_err_history = []
     # Maximum number of epochs = n_epochs
 
     DropoutLayer.activate()
@@ -657,141 +489,146 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
         epoch_done = False
         minibatch_index = 0
         while not epoch_done:
-            #iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
-            #print 'DEBUGGING', iter
-            sys.stdout.flush()
+            chunk_x, chunk_y = chunkLoader.getNext()
 
-            if tiny_train:
-                iter = (epoch - 1) * n_train_batches + minibatch_index
-                cost_ij = train_model(minibatch_index, learning_rate)
-                train_minibatch_error = test_model_train(minibatch_index)
-                minibatch_index += 1
-                epoch_done = (minibatch_index == n_train_batches)
-            else:
-                iter += 1
-                chunk_x, chunk_y = chunkLoader.getNext()
-                train_set_x.set_value(chunk_x)
-	        train_set_y.set_value(chunk_y)
+            train_set_x.set_value(chunk_x)
+	    train_set_y.set_value(chunk_y)        
 
-                local_buf_x[buf_index:buf_index+batch_size] = chunk_x
-                local_buf_y[buf_index:buf_index+batch_size] = chunk_y
-
-                buf_index = (buf_index+batch_size)%buf_size
+            for mb_ind in range(n_cand_chunk//batch_size):
+                iter += 1 #(epoch - 1) * n_train_batches + minibatch_index
+                #print 'DEBUGGING', iter
+                sys.stdout.flush()
                 
-                cost_ij = train_model(0, learning_rate)
-                DropoutLayer.deactivate()
-                train_minibatch_error = test_model_train(0)
-                DropoutLayer.activate()
-                epoch_done = chunkLoader.done
-            if iter % 100 == 0:
-                print 'training @ iter = ', iter, ", cost = ", cost_ij
-            train_loss_history.append(cost_ij.tolist())
-            train_err_history.append(train_minibatch_error)
-            iter_train_history.append(iter+1)
-
-            if train_minibatch_error > 0.1:
-                print "--> train minibatch error = ", train_minibatch_error
-                print "--> ", chunkLoader.current_file, chunkLoader.batch_i, chunkLoader.files[chunkLoader.current_file]
-
-	    # Adaptive Learning Rate
-	    if (iter+1) % stepsize == 0:
-                learning_rate = learning_rate*gamma
-		#learning_rate.set_value(np.array(learning_rate.get_value()*gamma, dtype="float32"))
-		print "Learning rate: ", learning_rate#learning_rate.get_value()
-
-	    #VALIDATION
-            if (iter + 1) % validation_frequency == 0:
-                DropoutLayer.deactivate()
-                print "iter ", iter, " validation"
-                # compute zero-one loss on validation set
-                validation_errors = [validate_model(i) for i
-                                     in xrange(n_valid_batches)]
-                this_validation_error = numpy.mean(validation_errors)
-		val_err_history.append(this_validation_error)
-
-                validation_losses = [validation_loss(i) for i
-                                     in xrange(n_valid_batches)]
-                this_validation_loss = numpy.mean(validation_losses)
-		val_loss_history.append(this_validation_loss)
-
-                iter_val_history.append(iter+1)
-                print('epoch %i, iter %i, validation loss %f' %
-                      (epoch, iter + 1,
-                       this_validation_loss))
-                
-                print('epoch %i, iter %i, validation error %f %%' %
-                      (epoch, iter + 1,
-                       this_validation_error * 100.))
-                print('epoch %i, iter %i, train minibatch error %f %%' %
-                      (epoch, iter + 1,
-                       train_minibatch_error * 100.))
-                
-                # Error calculation for the training buffer
-                if not tiny_train:
-                    buf_train_set_x.set_value(local_buf_x)
-                    buf_train_set_y.set_value(local_buf_y)
-                    buffer_errors = [train_buffer_error(i) for i in xrange(buf_size/batch_size)]
-                    train_buf_err = numpy.mean(buffer_errors)
-                    train_buf_err_history.append(train_buf_err)
-                    print('epoch %i, iter %i, train buffer error %f %%' %
-                          (epoch, iter + 1,
-                           train_buf_err * 100.))
-                # if we got the best validation score until now
-                if this_validation_error < best_validation_error:
-
-                    #improve patience if loss improvement is good enough
-                    if this_validation_error < patience_loss *  \
-                       improvement_threshold:
-                        patience = max(patience, min((iter * patience_increase, max_patience_increase + iter)))
-                        print "patience = ", patience, improvement_threshold, iter * patience_increase
-                        patience_loss = this_validation_error
-                    # save best validation score and iteration number
-                    best_validation_error = this_validation_error
-                    best_iter = iter
-                    best_params = params
-
-                    ## test it on the test set
-                    #test_losses = [
-                    #    test_model(i)
-                    #    for i in xrange(n_test_batches)
-                    #]
-                    #test_score = numpy.mean(test_losses)
-
-
-                    # test it on the train set
-                    #train_losses = [
-                    #    test_model_train(i)
-                    #    for i in xrange(n_test_batches)
-                    #]
-                    #train_score = numpy.mean(train_losses)
-
-                    #val_FPR = [validate_FPR(i) for i
-                    #                 in xrange(n_valid_batches)]
-                    #FPR = numpy.mean(val_FPR)
-                    #val_FNR = [validate_FNR(i) for i
-                    #                 in xrange(n_valid_batches)]
-                    #FNR = numpy.mean(val_FNR)
-
-                    #print(('     epoch %i, minibatch %i/%i, test error of '
-                    #       'best model %f %%') %
-                    #      (epoch, minibatch_index + 1, n_train_batches,
-                    #       test_score * 100.))
-
-                    #print "FPR, FNR = ", FPR, FNR
+                if tiny_train:
+                    iter = (epoch - 1) * n_train_batches + minibatch_index
+                    cost_ij = train_model(minibatch_index, learning_rate)
+                    train_minibatch_error = test_model_train(minibatch_index)
+                    minibatch_index += 1
+                    epoch_done = (minibatch_index == n_train_batches)
+                else:
                     
-                    errors_val.append(best_validation_error * 100)
-                    #errors_test.append(test_score * 100)
-                    #errors_train.append(train_score * 100)
-                    iters.append(iter)
-                    times.append(time.clock()-start_time)
-                    #FPRs.append(FPR)
-                    #FNRs.append(FNR)
-                DropoutLayer.activate()
+#                    local_buf_x[buf_index:buf_index+batch_size] = chunk_x
+#                    local_buf_y[buf_index:buf_index+batch_size] = chunk_y
+#                    
+#                    buf_index = (buf_index+batch_size)%buf_size
+#
+                    #print "training mb_ind:", mb_ind, "iter", iter
+                    cost_ij = train_model(mb_ind, learning_rate)
+                    DropoutLayer.deactivate()
+                    train_minibatch_error = test_model_train(0)
+                    DropoutLayer.activate()
+                    epoch_done = chunkLoader.done
+                    
+                if iter % 100 == 0:
+                    print 'training @ iter = ', iter, ", cost = ", cost_ij
+                train_loss_history.append(cost_ij.tolist())
+                train_err_history.append(train_minibatch_error)
+                iter_train_history.append(iter+1)
+                
+                if train_minibatch_error > 0.1:
+                    print "--> train minibatch error = ", train_minibatch_error
+                    print "--> current file", chunkLoader.current_file, " batch:", mb_ind, " filename", chunkLoader.files[chunkLoader.current_file]
 
-            if patience <= iter:
-                done_looping = True
-                print "patience <= iter", patience, iter
-                break
+	        # Adaptive Learning Rate
+	        if (iter+1) % stepsize == 0:
+                    learning_rate = learning_rate*gamma
+		    #learning_rate.set_value(np.array(learning_rate.get_value()*gamma, dtype="float32"))
+		    print "Learning rate: ", learning_rate#learning_rate.get_value()
+
+	        #VALIDATION
+                if (iter + 1) % validation_frequency == 0:
+                    exit()
+                    DropoutLayer.deactivate()
+                    print "iter ", iter, " validation"
+                    # compute zero-one loss on validation set
+                    validation_errors = [validate_model(i) for i
+                                         in xrange(n_valid_batches)]
+                    this_validation_error = numpy.mean(validation_errors)
+		    val_err_history.append(this_validation_error)
+
+                    validation_losses = [validation_loss(i) for i
+                                         in xrange(n_valid_batches)]
+                    this_validation_loss = numpy.mean(validation_losses)
+		    val_loss_history.append(this_validation_loss)
+                    
+                    iter_val_history.append(iter+1)
+                    print('epoch %i, iter %i, validation loss %f' %
+                          (epoch, iter + 1,
+                           this_validation_loss))
+                    
+                    print('epoch %i, iter %i, validation error %f %%' %
+                          (epoch, iter + 1,
+                           this_validation_error * 100.))
+                    print('epoch %i, iter %i, train minibatch error %f %%' %
+                          (epoch, iter + 1,
+                           train_minibatch_error * 100.))
+                
+                    # Error calculation for the training buffer
+                    if not tiny_train:
+#                        buf_train_set_x.set_value(local_buf_x)
+#                        buf_train_set_y.set_value(local_buf_y)
+#                        buffer_errors = [train_buffer_error(i) for i in xrange(buf_size/batch_size)]
+#                        train_buf_err = numpy.mean(buffer_errors)
+#                        train_buf_err_history.append(train_buf_err)
+#                        print('epoch %i, iter %i, train buffer error %f %%' %
+#                              (epoch, iter + 1,
+#                               train_buf_err * 100.))
+#                        # if we got the best validation score until now
+                        if this_validation_error < best_validation_error:
+                            
+                            #improve patience if loss improvement is good enough
+                            if this_validation_error < patience_loss *  \
+                               improvement_threshold:
+                                patience = max(patience, min((iter * patience_increase, max_patience_increase + iter)))
+                                print "patience = ", patience, improvement_threshold, iter * patience_increase
+                                patience_loss = this_validation_error
+                                # save best validation score and iteration number
+                            best_validation_error = this_validation_error
+                            best_iter = iter
+                            best_params = params
+
+                        ## test it on the test set
+                        #test_losses = [
+                        #    test_model(i)
+                        #    for i in xrange(n_test_batches)
+                        #]
+                        #test_score = numpy.mean(test_losses)
+
+
+                        # test it on the train set
+                        #train_losses = [
+                        #    test_model_train(i)
+                        #    for i in xrange(n_test_batches)
+                        #]
+                        #train_score = numpy.mean(train_losses)
+                        
+                        #val_FPR = [validate_FPR(i) for i
+                        #                 in xrange(n_valid_batches)]
+                        #FPR = numpy.mean(val_FPR)
+                        #val_FNR = [validate_FNR(i) for i
+                        #                 in xrange(n_valid_batches)]
+                        #FNR = numpy.mean(val_FNR)
+
+                        #print(('     epoch %i, minibatch %i/%i, test error of '
+                        #       'best model %f %%') %
+                        #      (epoch, minibatch_index + 1, n_train_batches,
+                        #       test_score * 100.))
+
+                        #print "FPR, FNR = ", FPR, FNR
+                    
+                        errors_val.append(best_validation_error * 100)
+                        #errors_test.append(test_score * 100)
+                        #errors_train.append(train_score * 100)
+                        iters.append(iter)
+                        times.append(time.clock()-start_time)
+                        #FPRs.append(FPR)_
+                        #FNRs.append(FNR)
+                    DropoutLayer.activate()
+
+                if patience <= iter:
+                    done_looping = True
+                    print "patience <= iter", patience, iter
+                    break
 
         chunkLoader.done = False
 
@@ -893,10 +730,10 @@ def evaluate_convnet(data_path, n_cand_chunk, base_lr=0.1, stepsize=50000, gamma
                      'train_err_history': train_err_history,
                      'train_loss_history': train_loss_history},
                     f, pickle.HIGHEST_PROTOCOL)
-    with open("training_buffer_history.pkl", "w") as f:
-        pickle.dump({'iter_train_buf_history': iter_val_history,
-                     'train_buf_err_history': train_buf_err_history},
-                    f, pickle.HIGHEST_PROTOCOL)
+    #with open("training_buffer_history.pkl", "w") as f:
+    #    pickle.dump({'iter_train_buf_history': iter_val_history,
+    #                 'train_buf_err_history': train_buf_err_history},
+    #                f, pickle.HIGHEST_PROTOCOL)
     with open("validation_history.pkl", "w") as f:
         pickle.dump({'iter_val_history': iter_val_history,
                      'val_err_history': val_err_history,

@@ -55,7 +55,7 @@ class LogisticRegression(object):
     determine a class membership probability.
     """
 
-    def __init__(self, input, n_in, n_out):
+    def __init__(self, input, n_in, n_out, W=None, b=None):
         """ Initialize the parameters of the logistic regression
 
         :type input: theano.tensor.TensorType
@@ -72,24 +72,31 @@ class LogisticRegression(object):
 
         """
         # start-snippet-1
-        # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
-        self.W = theano.shared(
-            value=numpy.zeros(
-                (n_in, n_out),
-                dtype=theano.config.floatX
-            ),
-            name='W',
-            borrow=True
-        )
-        # initialize the baises b as a vector of n_out 0s
-        self.b = theano.shared(
-            value=numpy.zeros(
-                (n_out,),
-                dtype=theano.config.floatX
-            ),
-            name='b',
-            borrow=True
-        )
+        if W==None:
+            # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
+            self.W = theano.shared(
+                value=numpy.zeros(
+                    (n_in, n_out),
+                    dtype=theano.config.floatX
+                ),
+                name='W',
+                borrow=True
+            )
+        else:
+            self.W = W
+
+        if b==None:
+            # initialize the baises b as a vector of n_out 0s
+            self.b = theano.shared(
+                value=numpy.zeros(
+                    (n_out,),
+                    dtype=theano.config.floatX
+                ),
+                name='b',
+                borrow=True
+            )
+        else:
+            self.b = b
 
         # symbolic expression for computing the matrix of class-membership
         # probabilities
@@ -225,7 +232,10 @@ class LogisticRegression(object):
             return T.mean(FP)/T.mean(N)
         else:
             raise NotImplementedError()
-
+    def load_params(self, W, b):
+        self.W.set_value(W)
+        self.b.set_value(b)
+        print "Logistic Regression parameters loaded"
 
 def load_data(dataset):
     ''' Loads the dataset
