@@ -3,8 +3,8 @@ import numpy as np
 import pylab as pl
 
 #train = np.load (sys.argv[1] + "/training_history.pkl")
-train = np.load(sys.argv[1] + "/training_buffer_history.pkl")
-valid = np.load (sys.argv[1] + "/validation_history.pkl")
+train = np.load(sys.argv[1] + "/final_training_buffer_history.pkl")
+valid = np.load (sys.argv[1] + "/final_validation_history.pkl")
 
 i_tr = np.array(train['iter_train_buf_history'])
 e_tr = np.array(train['train_buf_err_history'])

@@ -36,5 +36,8 @@ pl.ylabel("FNR")
 pl.xscale("log")
 pl.yscale("log")
 pl.legend(loc = "lower left")
+
+#pl.show()
+
 pl.savefig ("DET_models.eps")
 
