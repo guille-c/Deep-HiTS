@@ -9,7 +9,7 @@ matplotlib.rc('font', **font)
 
 train = np.load (sys.argv[1] + "/training_buffer_history.pkl")
 valid = np.load (sys.argv[1] + "/validation_history.pkl")
-test = 0.00839
+test = 0.0068#0.00839
 
 i_tr = np.array([100] + train['iter_train_buf_history'])
 e_tr = np.array([0.1818] + train['train_buf_err_history'])
