@@ -50,7 +50,16 @@ class DropoutLayer(object):
         self.output = self.isActive*self.activated*self.input +\
                       (1-self.isActive)*self.drop_prob*self.input
         self.instances.append(self)
+        self.output_shape = None
 
+    def setOutputShape(self, output_shape):
+        self.output_shape = output_shape
+    def getOutputShape(self):
+        return self.output_shape
+    def hasParams(self):
+        return False
+    def nParams(self):
+        return 0
     @staticmethod
     def activate():
         for instance in DropoutLayer.instances:
@@ -64,7 +73,7 @@ class DropoutLayer(object):
 # start-snippet-1
 class HiddenLayer(object):
     def __init__(self, rng, input, n_in, n_out, W=None, b=None,
-                 activation=T.tanh):
+                 activation=T.tanh,init_type='tanh'):
         """
         Typical hidden layer of a MLP: units are fully-connected and have
         sigmoidal activation function. Weight matrix W is of shape (n_in,n_out)
@@ -106,14 +115,25 @@ class HiddenLayer(object):
         #        We have no info for other function, so we use the same as
         #        tanh.
         if W is None:
-            W_values = numpy.asarray(
-                rng.uniform(
-                    low=-numpy.sqrt(6. / (n_in + n_out)),
-                    high=numpy.sqrt(6. / (n_in + n_out)),
-                    size=(n_in, n_out)
-                ),
-                dtype=theano.config.floatX
-            )
+            if init_type=="ReLU":
+                print "HiddenLayer with He init"
+                W_values = numpy.asarray(
+                    rng.normal(
+                        0,
+                        numpy.sqrt(2.0/n_in),
+                        size=(n_in, n_out)
+                    )
+                )
+            else:
+                print "HiddenLayer with Xavier init"
+                W_values = numpy.asarray(
+                    rng.uniform(
+                        low=-numpy.sqrt(6. / (n_in + n_out)),
+                        high=numpy.sqrt(6. / (n_in + n_out)),
+                        size=(n_in, n_out)
+                    ),
+                    dtype=theano.config.floatX
+                )
             if activation == theano.tensor.nnet.sigmoid:
                 W_values *= 4
 
@@ -133,7 +153,22 @@ class HiddenLayer(object):
         )
         # parameters of the model
         self.params = [self.W, self.b]
-
+        self.n_out = n_out
+        self.batch_size = None
+        
+    def setBatchSize(self, batch_size):
+        self.batch_size = batch_size
+    def getOutputShape(self):
+        return [self.batch_size, self.n_out]
+                                      
+    def load_params(self, W, b):
+        self.W.set_value(W)
+        self.b.set_value(b)
+        print 'Hidden Layer parameters loaded'
+    def hasParams(self):
+        return True
+    def nParams(self):
+        return 2
 
 # start-snippet-2
 class MLP(object):

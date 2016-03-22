@@ -34,6 +34,6 @@ if __name__=='__main__':
     files.sort()
     for f in files:
         print f
-        #rotate(f,train_dir,90)
+        rotate(f,train_dir,90)
         rotate(f,train_dir,180)
-        #rotate(f,train_dir,270)
+        rotate(f,train_dir,270)

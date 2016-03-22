@@ -1,3 +1,8 @@
 ../../runs/RF_50000/RF_test_predictions_full.pkl;RF_pbbs;RF
 ../../runs/paper_with_borders_diff/test_predictions.pkl;ConvNet_pbbs;ConvNet-1
 ../../runs/paper_with_borders/test_predictions.pkl;ConvNet_pbbs;ConvNet-4
+
+
+#/home/shared/Fields_12-2015/RF_test_predictions_full.pkl;RF_pbbs;Random Forest
+#../../runs/paper_with_borders/test_predictions.pkl;ConvNet_pbbs;Model A
+#../../runs/arch7/test_predictions.pkl;ConvNet_pbbs;Model F

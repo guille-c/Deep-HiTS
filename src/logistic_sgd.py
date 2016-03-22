@@ -55,7 +55,7 @@ class LogisticRegression(object):
     determine a class membership probability.
     """
 
-    def __init__(self, input, n_in, n_out):
+    def __init__(self, input, n_in, n_out, W=None, b=None, rng=None, init_type="tanh"):
         """ Initialize the parameters of the logistic regression
 
         :type input: theano.tensor.TensorType
@@ -72,24 +72,46 @@ class LogisticRegression(object):
 
         """
         # start-snippet-1
-        # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
-        self.W = theano.shared(
-            value=numpy.zeros(
-                (n_in, n_out),
-                dtype=theano.config.floatX
-            ),
-            name='W',
-            borrow=True
-        )
-        # initialize the baises b as a vector of n_out 0s
-        self.b = theano.shared(
-            value=numpy.zeros(
-                (n_out,),
-                dtype=theano.config.floatX
-            ),
-            name='b',
-            borrow=True
-        )
+        if W==None:
+            if init_type=="ReLU":
+                print "Logistic Regression Layer with He init"
+                if rng==None:
+                    rng = numpy.random.RandomState(23455)
+                std = numpy.sqrt(2.0/n_in)
+                self.W = theano.shared(
+                    value=numpy.asarray(
+                        rng.normal(0, std, size=(n_in, n_out)),
+                        dtype=theano.config.floatX
+                    ),
+                    name = 'W',
+                    borrow=True
+                )
+            else:
+                print "Logistic Regression Layer with zero init"
+                # initialize with 0 the weights W as a matrix of shape (n_in, n_out)
+                self.W = theano.shared(
+                    value=numpy.zeros(
+                        (n_in, n_out),
+                        dtype=theano.config.floatX
+                    ),
+                    name='W',
+                    borrow=True
+                )
+        else:
+            self.W = W
+
+        if b==None:
+            # initialize the baises b as a vector of n_out 0s
+            self.b = theano.shared(
+                value=numpy.zeros(
+                    (n_out,),
+                    dtype=theano.config.floatX
+                ),
+                name='b',
+                borrow=True
+            )
+        else:
+            self.b = b
 
         # symbolic expression for computing the matrix of class-membership
         # probabilities
@@ -108,6 +130,17 @@ class LogisticRegression(object):
 
         # parameters of the model
         self.params = [self.W, self.b]
+        self.output = self.p_y_given_x
+        self.n_out = n_out
+        self.batch_size = None
+    def setBatchSize(self, batch_size):
+        self.batch_size = batch_size
+    def getOutputShape(self):
+        return [self.batch_size, self.n_out]
+    def hasParams(self):
+        return True
+    def nParams(self):
+        return 2
 
     def negative_log_likelihood(self, y):
         """Return the mean of the negative log-likelihood of the prediction
@@ -225,7 +258,10 @@ class LogisticRegression(object):
             return T.mean(FP)/T.mean(N)
         else:
             raise NotImplementedError()
-
+    def load_params(self, W, b):
+        self.W.set_value(W)
+        self.b.set_value(b)
+        print "Logistic Regression parameters loaded"
 
 def load_data(dataset):
     ''' Loads the dataset

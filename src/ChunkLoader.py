@@ -83,7 +83,7 @@ class ChunkLoader():
 	return train_set
 	    
 if __name__=="__main__":
-    c = ChunkLoader('/home/ireyes/chunks_feat_50000/chunks_train/', 50000, 50, n_rot=0)
+    c = ChunkLoader('/home/shared/Fields_12-2015/chunks_feat_50000/chunks_train/', 50000, 50, n_rot=0)
     n_epochs = 3
     for e in np.arange(n_epochs):
         print "e = ", e
@@ -91,5 +91,5 @@ if __name__=="__main__":
         while not c.done:
 	    x,y = c.getNext()
             total += len(y)
-	    print e, total#x.shape, y.shape
+	    #print e, total#x.shape, y.shape
         c.done = False
