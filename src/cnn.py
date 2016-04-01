@@ -13,7 +13,6 @@ import theano.tensor as T
 
 from layers import *
 from loadHITS import *
-from ChunkLoader import *
 from ConvNet import *
 
 from ConfigParser import ConfigParser
