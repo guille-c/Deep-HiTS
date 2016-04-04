@@ -2,16 +2,8 @@ import os
 import sys
 import time
 
-import numpy
+import numpy as np
 import cPickle as pickle
-import theano
-import theano.tensor as T
-from theano.tensor.signal import downsample
-from theano.tensor.nnet import conv
-
-from logistic_sgd import LogisticRegression, load_data
-from mlp import HiddenLayer
-from loadHITS import *
 
 class ChunkLoader():
     def __init__(self, folder, n_cand_chunk, batch_size, n_rot = 3):

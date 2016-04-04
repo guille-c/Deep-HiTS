@@ -425,6 +425,7 @@ class DataLayer():
         return False
     def nParams(self):
         return 0
+
 class ResidualLayer():
     ### CHANGE WEIGHT INIT TO HE ET. AL. 2014 ###
     def __init__(self, rng, input, filter_shape, image_shape,
