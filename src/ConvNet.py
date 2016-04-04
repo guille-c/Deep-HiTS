@@ -23,6 +23,19 @@ class ConvNet():
         self.N_valid = N_valid
         self.N_test = N_test
 
+        N_train = 1250000
+        train_folder = data_path+'/chunks_train/'
+        valid_folder = data_path+'/chunk_validate/'
+        test_folder = data_path+'/chunk_test/'
+        self.dataInterface = DirectoryDataInterface(train_folder, valid_folder, test_folder,
+                                                    n_cand_chunk = n_cand_chunk,
+                                                    batch_size = batch_size,
+                                                    N_valid = N_valid,
+                                                    N_test = N_test,
+                                                    N_train = N_train,
+                                                    im_chan = im_chan,
+                                                    Im_size = im_size)
+        
         # Validation params
         self.improvement_threshold = improvement_threshold
         self.patience_increase = 2
