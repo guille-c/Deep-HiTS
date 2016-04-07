@@ -1,12 +1,13 @@
 import theano.tensor as T
 import numpy as np
 from ArchBuilder import *
+from time import time
 
 from loadHITS import *
 from ChunkLoader import *
 
 class ConvNet():
-    def __init__(self, data_path, arch_def,
+    def __init__(self, data_interface, arch_def,
                  batch_size=50,
                  base_lr=0.04, momentum=0.0,
                  activation=T.tanh, params=[None]*100,
@@ -14,7 +15,7 @@ class ConvNet():
                  N_valid = 100000, N_test = 100000, im_chan = 4,
                  im_size = 21, improvement_threshold = 0.99):
 
-        self.data_path = data_path
+        # self.data_path = data_path
         self.n_cand_chunk = n_cand_chunk
 
         self.batch_size = batch_size
@@ -24,17 +25,21 @@ class ConvNet():
         self.N_test = N_test
 
         N_train = 1250000
-        train_folder = data_path+'/chunks_train/'
-        valid_folder = data_path+'/chunk_validate/'
-        test_folder = data_path+'/chunk_test/'
-        self.dataInterface = DirectoryDataInterface(train_folder, valid_folder, test_folder,
-                                                    n_cand_chunk = n_cand_chunk,
-                                                    batch_size = batch_size,
-                                                    N_valid = N_valid,
-                                                    N_test = N_test,
-                                                    N_train = N_train,
-                                                    im_chan = im_chan,
-                                                    Im_size = im_size)
+        # train_folder = data_path+'/chunks_train/'
+        # valid_folder = data_path+'/chunks_validate/'
+        # test_folder = data_path+'/chunks_test/'
+
+        self.dataInterface = data_interface
+        # print "ConvNet: creating dataInterface"
+        # self.dataInterface = DirectoryDataInterface(train_folder, valid_folder, test_folder,
+        #                                             n_cand_chunk = n_cand_chunk,
+        #                                             batch_size = batch_size,
+        #                                             N_valid = N_valid,
+        #                                             N_test = N_test,
+        #                                             N_train = N_train,
+        #                                             im_chan = im_chan,
+        #                                             im_size = im_size)
+        # print "ConvNet: dataInterface created"
         
         # Validation params
         self.improvement_threshold = improvement_threshold
@@ -52,22 +57,25 @@ class ConvNet():
         self.buf_train_set_x, self.buf_train_set_y = shared_dataset((np.ones((buf_size,441*im_chan)), np.ones(buf_size)))
         self.local_buf_x = self.buf_train_set_x.get_value()
         self.local_buf_y = self.buf_train_set_y.get_value()
-        chunkLoader = ChunkLoader(data_path + '/chunks_validate/',
-                                  n_cand_chunk, n_cand_chunk, n_rot = n_rot)
+        # chunkLoader = ChunkLoader(data_path + '/chunks_validate/',
+        #                           n_cand_chunk, n_cand_chunk, n_rot = n_rot)
+        # 
+        # v_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
+        # v_y = np.array([], dtype = "int32")
+        # while (len(v_y) < self.N_valid):
+        #     v_x1, v_y1 = chunkLoader.getNext()
+        #     v_x = np.vstack((v_x, v_x1))
+        #     v_y = np.concatenate((v_y, v_y1))
 
-        v_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * im_chan))
-        v_y = np.array([], dtype = "int32")
-        while (len(v_y) < self.N_valid):
-            v_x1, v_y1 = chunkLoader.getNext()
-            v_x = np.vstack((v_x, v_x1))
-            v_y = np.concatenate((v_y, v_y1))
-        
+        print "ConvNet: getting validation data"
+        v_x, v_y = self.dataInterface.getValidationData ()
+        v_x, v_y = v_x.astype(th.config.floatX), v_y.astype("int32")
         print "validation set = ", len(v_y)
         self.valid_set_x, self.valid_set_y = shared_dataset ([v_x, v_y])
 
 
-        self.chunkLoader = ChunkLoader(data_path + '/chunks_train/',
-                                  n_cand_chunk, batch_size, n_rot = n_rot)
+        # self.chunkLoader = ChunkLoader(data_path + '/chunks_train/',
+        #                           n_cand_chunk, batch_size, n_rot = n_rot)
     
         self.n_valid_batches = self.N_valid / batch_size
     
@@ -187,9 +195,9 @@ class ConvNet():
         
     def train(self):
         # load chunk data
-        chunk_x, chunk_y = self.chunkLoader.getNext()
-        self.train_set_x.set_value(chunk_x)
-	self.train_set_y.set_value(chunk_y)
+        chunk_x, chunk_y = self.dataInterface.getNextTraining ()
+        self.train_set_x.set_value(chunk_x.astype(th.config.floatX))
+	self.train_set_y.set_value(chunk_y.astype("int32"))
 
         # update buffer
         self.local_buf_x[self.buf_index:self.buf_index+self.batch_size] = chunk_x
@@ -219,7 +227,9 @@ class ConvNet():
         # alert if train error is too high
         if train_minibatch_error > 0.1:
             print "--> train minibatch error = ", train_minibatch_error, " at iter ", self.it
-            print "--> ", self.chunkLoader.current_file, self.chunkLoader.batch_i, self.chunkLoader.files[self.chunkLoader.current_file]
+            print "--> ", self.dataInterface.chunkLoaderTrain.current_file, \
+                self.dataInterface.chunkLoaderTrain.batch_i, \
+                self.dataInterface.chunkLoaderTrain.files[self.dataInterface.chunkLoaderTrain.current_file]
 
         self.it+=1
 
@@ -228,6 +238,7 @@ class ConvNet():
         print "Learning rate: ", self.learning_rate
 
     def validate(self, patience):
+        t = time.time()
         DropoutLayer.deactivate()
         print "validation @ iter", self.it
 
@@ -266,6 +277,7 @@ class ConvNet():
         patience = self.checkBest(validation_error, patience)
         print 'patience after checkBest', patience
         DropoutLayer.activate()
+        print " validation time = ", time.time() - t
         return patience
 
     def checkBest(self, validation_error, patience):
@@ -300,20 +312,24 @@ class ConvNet():
         self.arch.loadParams(params)
         
     def test(self):
-        self.chunkLoader = ChunkLoader(self.data_path + '/chunks_test/',
-                                       self.n_cand_chunk, self.n_cand_chunk, n_rot = 0)
+        # self.chunkLoader = ChunkLoader(self.data_path + '/chunks_test/',
+        #                                self.n_cand_chunk, self.n_cand_chunk, n_rot = 0)
+        # 
+        # SNRs = []
+        # t_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * self.im_chan))
+        # t_y = np.array([], dtype = "int32")
+        # while (len(t_y) < self.N_test):
+        #     t_x1, t_y1 = self.chunkLoader.getNext()
+        #     t_x = np.vstack((t_x, t_x1))
+        #     t_y = np.concatenate((t_y, t_y1))
+        #     
+        #     SNRs += self.chunkLoader.current_minibatch_SNR().tolist()
 
-        SNRs = []
-        t_x = np.array([], dtype = th.config.floatX).reshape((0, 441 * self.im_chan))
-        t_y = np.array([], dtype = "int32")
-        while (len(t_y) < self.N_test):
-            t_x1, t_y1 = self.chunkLoader.getNext()
-            t_x = np.vstack((t_x, t_x1))
-            t_y = np.concatenate((t_y, t_y1))
-            
-            SNRs += self.chunkLoader.current_minibatch_SNR().tolist()
-           
+        t_x, t_y, SNRs = self.dataInterface.getTestData (get_SNRs = True)
+        t_x, t_y = t_x.astype(th.config.floatX), t_y.astype("int32")
+
         print "test set = ", len(t_x)
+        
         test_set_x, test_set_y = shared_dataset ([t_x, t_y])
         test_SNRs = np.array(SNRs)
         

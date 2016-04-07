@@ -14,6 +14,7 @@ import theano.tensor as T
 from layers import *
 from loadHITS import *
 from ConvNet import *
+from DirectoryDataInterface import *
 
 from ConfigParser import ConfigParser
 
@@ -24,14 +25,41 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                      N_valid = 100000, N_test = 100000,
                      validate_every_batches = 2000, n_rot = 0, activation = T.tanh,
                      tiny_train = False, buf_size=1000, savestep=50000,
-                     resume = None, improve_thresh = 0.99, ini_patience = 50000):
+                     resume = None, improve_thresh = 0.99, ini_patience = 50000,
+                     data_interface_str = "directory"):
 
-    convnet = ConvNet(data_path, arch_def, batch_size=batch_size,
+    if data_interface_str == "directory":
+        print "cnn.py: creating dataInterface"
+        train_folder = data_path+'/chunks_train/'
+        valid_folder = data_path+'/chunks_validate/'
+        test_folder = data_path+'/chunks_test/'
+        dataInterface = DirectoryDataInterface(train_folder, valid_folder, test_folder,
+                                               n_cand_chunk = n_cand_chunk,
+                                               batch_size = batch_size,
+                                               N_valid = N_valid,
+                                               N_test = N_test,
+                                               N_train = N_train,
+                                               im_chan = im_chan,
+                                               im_size = im_size)
+        print "cnn.py: dataInterface created"
+    elif data_interface_str == "random":
+        dataInterface = RandomDataInterface (data_path, 
+                                               n_cand_chunk = n_cand_chunk,
+                                               batch_size = batch_size,
+                                               N_valid = N_valid,
+                                               N_test = N_test,
+                                               N_train = N_train,
+                                               im_chan = im_chan,
+                                               im_size = im_size)
+
+    print "Creating ConvNet"
+    convnet = ConvNet(dataInterface, arch_def, batch_size=batch_size,
                       base_lr=base_lr, momentum=momentum,
                       activation=activation,
                       buf_size=buf_size, n_cand_chunk=n_cand_chunk, n_rot=n_rot,
                       N_valid=N_valid, N_test=N_test)
-
+    print "ConvNet created"
+    
     patience = ini_patience
     validation_frequency = min(validate_every_batches, patience/2)
     done_looping = False
@@ -80,7 +108,7 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
         ", patience ", patience, ", learning rate ", convnet.learning_rate
         while not epoch_done:
             sys.stdout.flush()
-            if convnet.it%savestep==0 and convnet.it>1:
+            if convnet.it%savestep==0: # and convnet.it>1:
                 print "Saving @ iter ", convnet.it
                 convnet.save(str(convnet.it))
                 with open(str(convnet.it)+"_training_state.pkl", "w") as f:
@@ -92,15 +120,19 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
         
             if convnet.it%stepsize==0 and convnet.it>1:
                 convnet.reduceLearningRate(gamma)
-            if convnet.it%validation_frequency==0 and convnet.it>1:
+            if convnet.it%validation_frequency==0: # and convnet.it>1:
                 patience = convnet.validate(patience)
+            t = time.clock()
             convnet.train()
-            epoch_done = convnet.chunkLoader.done
+            print " training time = ", time.clock() - t
+            epoch_done = convnet.dataInterface.doneTrain ()
             if patience <= convnet.it:
                 done_looping = True
                 print "patience <= iter", patience, convnet.it
                 break
-        convnet.chunkLoader.done = False
+        #convnet.chunkLoader.done = False
+        convnet.dataInterface.setDoneTrain (False)
+        
         epoch += 1
     elapsed_time = time.clock()-start_time
     print "Optimization complete"
@@ -158,5 +190,6 @@ if __name__ == '__main__':
                      savestep =int (c.get("vars", "savestep")),
                      resume = resume,
                      improve_thresh = float (c.get("vars", "improvement_threshold")),
-                     ini_patience = int (c.get("vars", "ini_patience"))
+                     ini_patience = int (c.get("vars", "ini_patience")),
+                     data_interface_str = c.get("vars", "data_interface")
     )
