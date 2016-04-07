@@ -64,7 +64,7 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
     validation_frequency = min(validate_every_batches, patience/2)
     done_looping = False
 
-    start_time = time.clock()
+    start_time = time.time()
     epoch = 0
 
     if resume != None:
@@ -122,9 +122,9 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                 convnet.reduceLearningRate(gamma)
             if convnet.it%validation_frequency==0: # and convnet.it>1:
                 patience = convnet.validate(patience)
-            t = time.clock()
+            t = time.time()
             convnet.train()
-            print " training time = ", time.clock() - t
+            print " training time = ", time.time() - t
             epoch_done = convnet.dataInterface.doneTrain ()
             if patience <= convnet.it:
                 done_looping = True
@@ -134,7 +134,7 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
         convnet.dataInterface.setDoneTrain (False)
         
         epoch += 1
-    elapsed_time = time.clock()-start_time
+    elapsed_time = time.time()-start_time
     print "Optimization complete"
     print >> sys.stderr, "Elapsed time: ", elapsed_time/60.0, " minutes" 
     convnet.test()
