@@ -1,0 +1,21 @@
+[vars]
+arch_py: arch7.py
+path_to_chunks: /home/shared/Fields_12-2015/chunks_feat_5000/all_chunks/
+n_cand_chunk: 50000
+base_lr: 0.04
+gamma: 0.5
+stepsize: 100000
+momentum: 0.0
+n_epochs: 1
+batch_size: 50
+N_train = 100000
+N_valid = 10000
+N_test = 10000
+validate_every_batches = 1000
+activation_function: PReLU
+tiny_train: False
+resume: None
+savestep: 25000
+improvement_threshold: 0.2
+ini_patience = 300
+data_interface: random
