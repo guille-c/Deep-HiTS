@@ -15,18 +15,19 @@ from layers import *
 from loadHITS import *
 from ConvNet import *
 from DirectoryDataInterface import *
+from RandomDataInterface import *
 
 from ConfigParser import ConfigParser
 
 def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                      base_lr=0.04, stepsize=50000, gamma = 0.5, momentum=0.0,
-                     n_epochs= 10000,
-                     batch_size=50,
-                     N_valid = 100000, N_test = 100000,
+                     n_epochs= 10000, batch_size=50,
+                     N_train =1250000, N_valid = 100000, N_test = 100000,
                      validate_every_batches = 2000, n_rot = 0, activation = T.tanh,
                      tiny_train = False, buf_size=1000, savestep=50000,
                      resume = None, improve_thresh = 0.99, ini_patience = 50000,
-                     data_interface_str = "directory"):
+                     data_interface_str = "directory",
+                     im_chan = 4, im_size = 21):
 
     if data_interface_str == "directory":
         print "cnn.py: creating dataInterface"
@@ -44,14 +45,17 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
         print "cnn.py: dataInterface created"
     elif data_interface_str == "random":
         dataInterface = RandomDataInterface (data_path, 
-                                               n_cand_chunk = n_cand_chunk,
-                                               batch_size = batch_size,
-                                               N_valid = N_valid,
-                                               N_test = N_test,
-                                               N_train = N_train,
-                                               im_chan = im_chan,
-                                               im_size = im_size)
-
+                                             n_cand_chunk = n_cand_chunk,
+                                             batch_size = batch_size,
+                                             N_valid = N_valid,
+                                             N_test = N_test,
+                                             N_train = N_train,
+                                             im_chan = im_chan,
+                                             im_size = im_size)
+    else:
+        print "cnn.py: " + data_interface_str + " not implemented."
+        exit()
+        
     print "Creating ConvNet"
     convnet = ConvNet(dataInterface, arch_def, batch_size=batch_size,
                       base_lr=base_lr, momentum=momentum,
@@ -178,6 +182,7 @@ if __name__ == '__main__':
                      momentum = float (c.get("vars","momentum")),
                      n_epochs = int (c.get("vars", "n_epochs")),
                      batch_size = int (c.get("vars", "batch_size")),
+                     N_train = int (c.get("vars", "N_train")),
                      N_valid = int (c.get("vars", "N_valid")),
                      N_test = int (c.get("vars", "N_test")),
                      #N_valid = 70000, N_test = 70000,
