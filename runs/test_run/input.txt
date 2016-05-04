@@ -1,0 +1,21 @@
+[vars]
+arch_py: arch7.py
+path_to_chunks: ../../data/test_data/
+n_cand_chunk: 5000
+base_lr: 0.04
+gamma: 0.5
+stepsize: 100000
+momentum: 0.0
+n_epochs: 1
+batch_size: 50
+N_train = 5000
+N_valid = 5000
+N_test = 5000
+validate_every_batches = 1000
+activation_function: PReLU
+tiny_train: False
+resume: None
+savestep: 25000
+improvement_threshold: 0.2
+ini_patience = 300
+data_interface: random
