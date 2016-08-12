@@ -46,7 +46,8 @@ class ConvNet():
         self.patience_increase = 2
         self.max_patience_increase = 100000
         
-        rng = np.random.RandomState(23455)
+        #rng = np.random.RandomState(23455)
+        rng = np.random.RandomState()
 
         self.im_chan = im_chan
         # Creation of validation and test sets
