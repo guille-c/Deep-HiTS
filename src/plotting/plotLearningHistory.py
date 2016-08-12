@@ -9,7 +9,8 @@ matplotlib.rc('font', **font)
 
 #train = np.load (sys.argv[1] + "/training_buffer_history.pkl")
 #valid = np.load (sys.argv[1] + "/validation_history.pkl")
-#test = 0.0068#0.00839
+test = 0.00531000 #arch7
+#0.0068#0.00839
 train = np.load(sys.argv[1] + "/final_training_buffer_history.pkl")
 valid = np.load (sys.argv[1] + "/final_validation_history.pkl")
 
@@ -56,7 +57,7 @@ pl.savefig (sys.argv[1] + "/learning_history.eps")
 pl.clf()
 pl.hist (e_tr, bins = 1000)
 pl.savefig("hist_etrain")
-||||||| merged common ancestors
+exit()
 pl.plot (i_tr, e_tr, label = "Training set")
 pl.plot (i_val, e_val, label = "Validation set")
 pl.legend (loc = "best")
