@@ -1,3 +1,0 @@
-python2 ../../src/RandomForest/Chunks2RFPickle.py /home/shared/Fields_12-2015/chunks_feat_50000/ ./ 50000
-
-python2 ../../src/RandomForest/RandomForest.py ./

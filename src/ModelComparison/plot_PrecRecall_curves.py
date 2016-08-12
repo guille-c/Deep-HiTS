@@ -13,16 +13,21 @@ matplotlib.rc('font', **font)
 in_file = open(sys.argv[1])
 
 pl.clf()
-ls = [":", "--", "-", "-."]
+ls = ["--", "-", ":", "-."]
 i = 0
 for line in in_file:
+    if line[0] == '#' or line[0] == '\n':
+        continue
     fn, pred_name, lab = line.split(";")
     
     pkl = np.load (fn)
 
     y = pkl["labels"]
-    pred = pkl[pred_name][:, 1]
-
+    if len(pkl[pred_name].shape) == 1:
+        pred = pkl[pred_name]
+    else:
+        pred = pkl[pred_name][:, 1]
+    print pred
     #prec_RF, rec, _ = precision_recall_curve(y_RF, pred_RF)
     fpr, tpr, _ = roc_curve(y, pred)
     auc_ = auc(fpr, tpr)
@@ -40,6 +45,8 @@ pl.xlabel("FPR")
 pl.ylabel("FNR")
 pl.xscale("log")
 pl.yscale("log")
+pl.grid(True)
+pl.xlim([1e-5, 3e-1])
 pl.legend(loc = "lower left")
 
 #pl.show()
