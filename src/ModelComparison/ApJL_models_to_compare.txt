@@ -1,0 +1,3 @@
+../../runs/RF_5000/test_pred_RF_all.pkl;RF_pbbs;RF
+../../runs/arch7/test_predictions.pkl;ConvNet_pbbs;CNN
+#../../runs/random4/test_predictions.pkl;ConvNet_pbbs;CNN random4
