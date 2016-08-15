@@ -63,5 +63,5 @@ data_interface: directory
 
 ##Data
 
-Data can be downloaded from the [Quimal Archiving System](http://archiving.cmm.uchile.cl/).
+Data can be downloaded from the [Quimal Archiving System](http://archiving.cmm.uchile.cl/pub/DeepHits/all_chunks.tar.gz).
 
