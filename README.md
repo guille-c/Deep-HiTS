@@ -61,6 +61,7 @@ data_interface: directory
 -- `directory`: inside the directory `path_to_chunks`(see above) we will have three folders: `chunks_train`,  `chunks_validate`, and ``. Chunks of data in each of the is used for training, validating, and testing respectively.
 -- `random`: inside the directory `path_to_chunks`(see above) we will have all chunks, and training, validation, and test set will be chosen randomly.
 
-##Reading data
+##Data
 
+Data can be downloaded from the [Quimal Archiving System](http://archiving.cmm.uchile.cl/).
 
