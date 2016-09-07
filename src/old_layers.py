@@ -3,16 +3,11 @@ import numpy
 import theano
 import theano.tensor as T
 
-#from theano.tensor.signal import downsample
+from theano.tensor.signal import downsample
 #from theano.tensor.nnet import conv
-
-#from theano.sandbox.cuda.basic_ops import gpu_contiguous
-#from pylearn2.sandbox.cuda_convnet.filter_acts import FilterActs
-#from pylearn2.sandbox.cuda_convnet.pool import MaxPool
-
-# Is being used. cuDNN 5
-from theano.sandbox.cuda.dnn import dnn_conv
-from theano.sandbox.cuda.dnn import dnn_pool
+from theano.sandbox.cuda.basic_ops import gpu_contiguous
+from pylearn2.sandbox.cuda_convnet.filter_acts import FilterActs
+from pylearn2.sandbox.cuda_convnet.pool import MaxPool
 
 from theano.sandbox.rng_mrg import MRG_RandomStreams
 srng = MRG_RandomStreams()
@@ -21,12 +16,15 @@ def rectify(x, alpha=0):
     f1 = 0.5 * (1 + alpha)
     f2 = 0.5 * (1 - alpha)
     return f1 * x + f2 * abs(x)
-
 def relu(x):
     return rectify(x, alpha=0)
-
-def leaky_relu(x):
+    #return T.nnet.relu(x)
+    #return T.switch(x<0, 0, x)
+def prelu(x):
     return rectify(x, alpha=0.01)
+    #return T.nnet.relu(x, alpha=0.01)
+    return T.switch(x<0, 0.01*x, x)
+
 
 class LogisticRegression(object):
     """Multi-class Logistic Regression Class
@@ -78,7 +76,7 @@ class LogisticRegression(object):
 		name='W',
 		borrow=True
 	    )
-        if not W is None:
+        if W!=None:
             self.W.set_value(W)
 
 	# initialize the baises b as a vector of n_out 0s
@@ -90,7 +88,7 @@ class LogisticRegression(object):
 	    name='b',
 	    borrow=True
 	)
-        if not b is None:
+        if b!=None:
             self.b.set_value(b)
 
         # symbolic expression for computing the matrix of class-membership
@@ -346,12 +344,12 @@ class HiddenLayer(object):
 	    W_values *= 4
 
 	self.W = theano.shared(value=W_values, name='W', borrow=True)
-	if not W is None:
+	if W!=None:
 	    self.W.set_value(W)
 
 	b_values = numpy.zeros((n_out,), dtype=theano.config.floatX)
 	self.b = theano.shared(value=b_values, name='b', borrow=True)
-	if not b is None:
+	if b!=None:
 	    self.b.set_value(b)
 	
         lin_output = T.dot(input, self.W) + self.b
@@ -428,121 +426,121 @@ class DataLayer():
     def nParams(self):
         return 0
 
-#class ResidualLayer():
-#    ### CHANGE WEIGHT INIT TO HE ET. AL. 2014 ###
-#    def __init__(self, rng, input, filter_shape, image_shape,
-#                 activation=leaky_relu, W1=None, W2=None, b1=None, b2=None):
-#
-#        assert image_shape[1] == filter_shape[1]
-#        self.input = input
-#
-#	# there are "num input feature maps * filter height * filter width"
-#	# inputs to each hidden unit
-#	fan_in = numpy.prod(filter_shape[1:])
-#	# each unit in the lower layer receives a gradient from:
-#	# "num output feature maps * filter height * filter width" /
-#	#   pooling size
-#	fan_out = filter_shape[0] * numpy.prod(filter_shape[2:])
-#	# initialize weights with random weights
-#	W_bound = numpy.sqrt(6. / (fan_in + fan_out))
-#	self.W1 = theano.shared(
-#	    numpy.asarray(
-#		rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
-#		dtype=theano.config.floatX
-#	    ),
-#	    borrow=True
-#	)
-#        if not W1 is None:
-#            self.W1.set_value(W1)
-#
-#	# the bias is a 1D tensor -- one bias per output feature map
-#	b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
-#	self.b1 = theano.shared(value=b_values, borrow=True)
-#        if not b1 is None:
-#            self.b1.set_value(b1)
-#
-#
-#        assert filter_shape[2]%2==1# odd size
-#        pad = (filter_shape[2]-1)//2
-#            
-#        input_shuffled = input.dimshuffle(1, 2, 3, 0) # bc01 to c01b
-#        w1_shuffled = self.W1.dimshuffle(1, 2, 3, 0) # bc01 to c01b
-#        conv_op1 = FilterActs(stride=1, partial_sum=1, pad=pad)
-#        contiguous_input = gpu_contiguous(input_shuffled)
-#        contiguous_w1 = gpu_contiguous(w1_shuffled)
-#        conv_out_1_shuffled = conv_op1(contiguous_input, contiguous_w1)
-#        conv_out_1 = conv_out_1_shuffled.dimshuffle(3, 0, 1, 2)# c01b to bc01
-#        activ_1_out = activation(conv_out_1+self.b1.dimshuffle('x',0,'x','x'))
-#
-#
-#        filter_shape[1] = filter_shape[0]
-#
-#	# there are "num input feature maps * filter height * filter width"
-#	# inputs to each hidden unit
-#	fan_in = numpy.prod(filter_shape[1:])
-#	# each unit in the lower layer receives a gradient from:
-#	# "num output feature maps * filter height * filter width" /
-#	#   pooling size
-#	fan_out = filter_shape[0] * numpy.prod(filter_shape[2:])
-#	# initialize weights with random weights
-#	W_bound = numpy.sqrt(6. / (fan_in + fan_out))
-#	self.W2 = theano.shared(
-#	    numpy.asarray(
-#		rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
-#		dtype=theano.config.floatX
-#	    ),
-#	    borrow=True
-#	)
-#        if not W2 is None:
-#            self.W2.set_value(W2)
-#
-#	# the bias is a 1D tensor -- one bias per output feature map
-#	b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
-#	self.b2 = theano.shared(value=b_values, borrow=True)
-#        if not b2 is None:
-#            self.b2.set_value(b2)
-#
-#        w2_shuffled = self.W2.dimshuffle(1, 2, 3, 0) # bc01 to c01b
-#        activ_1_out_shuffled = activ_1_out.dimshuffle(1, 2, 3, 0) # bc01 to c01b
-#        contiguous_activ_1_out = gpu_contiguous(activ_1_out_shuffled)
-#        contiguous_w2 = gpu_contiguous(w2_shuffled)
-#        conv_op2 = FilterActs(stride=1, partial_sum=1, pad=pad)
-#        conv_out_2_shuffled = conv_op2(contiguous_activ_1_out, contiguous_w2)
-#        conv_out_2 = conv_out_2_shuffled.dimshuffle(3, 0, 1, 2) # c01b to bc01
-#        self.output = activation(conv_out_2+self.b2.dimshuffle('x', 0, 'x', 'x')+input)
-#
-#        stride = 1# not used
-#        assert (image_shape[2]-filter_shape[2]+2*pad)%stride==0
-#        output_im_size = (image_shape[2]-filter_shape[2]+2*pad)/stride+1
-#        self.output_shape = [image_shape[0],
-#                            filter_shape[0],
-#                            output_im_size,
-#                            output_im_size]
-#                            
-#        # store parameters of this layer
-#        self.params = [self.W1, self.b1, self.W2, self.b2]
-#
-#    def getOutputShape(self):
-#        return self.output_shape
-#    
-#    def load_params(self, W1, b1, W2, b2):
-#        self.W1.set_value(W1)
-#        self.b1.set_value(b1)
-#        self.W2.set_value(W2)
-#        self.b2.set_value(b2)
-#
-#        print 'Residual Layer parameters loaded'
-#    def hasParams(self):
-#        return True
-#    def nParams(self):
-#        return 4
-#
+class ResidualLayer():
+    ### CHANGE WEIGHT INIT TO HE ET. AL. 2014 ###
+    def __init__(self, rng, input, filter_shape, image_shape,
+                 activation=prelu, W1=None, W2=None, b1=None, b2=None):
+
+        assert image_shape[1] == filter_shape[1]
+        self.input = input
+
+	# there are "num input feature maps * filter height * filter width"
+	# inputs to each hidden unit
+	fan_in = numpy.prod(filter_shape[1:])
+	# each unit in the lower layer receives a gradient from:
+	# "num output feature maps * filter height * filter width" /
+	#   pooling size
+	fan_out = filter_shape[0] * numpy.prod(filter_shape[2:])
+	# initialize weights with random weights
+	W_bound = numpy.sqrt(6. / (fan_in + fan_out))
+	self.W1 = theano.shared(
+	    numpy.asarray(
+		rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
+		dtype=theano.config.floatX
+	    ),
+	    borrow=True
+	)
+        if W1!=None:
+            self.W1.set_value(W1)
+
+	# the bias is a 1D tensor -- one bias per output feature map
+	b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
+	self.b1 = theano.shared(value=b_values, borrow=True)
+        if b1!=None:
+            self.b1.set_value(b1)
+
+
+        assert filter_shape[2]%2==1# odd size
+        pad = (filter_shape[2]-1)//2
+            
+        input_shuffled = input.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        w1_shuffled = self.W1.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        conv_op1 = FilterActs(stride=1, partial_sum=1, pad=pad)
+        contiguous_input = gpu_contiguous(input_shuffled)
+        contiguous_w1 = gpu_contiguous(w1_shuffled)
+        conv_out_1_shuffled = conv_op1(contiguous_input, contiguous_w1)
+        conv_out_1 = conv_out_1_shuffled.dimshuffle(3, 0, 1, 2)# c01b to bc01
+        activ_1_out = activation(conv_out_1+self.b1.dimshuffle('x',0,'x','x'))
+
+
+        filter_shape[1] = filter_shape[0]
+
+	# there are "num input feature maps * filter height * filter width"
+	# inputs to each hidden unit
+	fan_in = numpy.prod(filter_shape[1:])
+	# each unit in the lower layer receives a gradient from:
+	# "num output feature maps * filter height * filter width" /
+	#   pooling size
+	fan_out = filter_shape[0] * numpy.prod(filter_shape[2:])
+	# initialize weights with random weights
+	W_bound = numpy.sqrt(6. / (fan_in + fan_out))
+	self.W2 = theano.shared(
+	    numpy.asarray(
+		rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
+		dtype=theano.config.floatX
+	    ),
+	    borrow=True
+	)
+        if W2!=None:
+            self.W2.set_value(W2)
+
+	# the bias is a 1D tensor -- one bias per output feature map
+	b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
+	self.b2 = theano.shared(value=b_values, borrow=True)
+        if b2!=None:
+            self.b2.set_value(b2)
+
+        w2_shuffled = self.W2.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        activ_1_out_shuffled = activ_1_out.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        contiguous_activ_1_out = gpu_contiguous(activ_1_out_shuffled)
+        contiguous_w2 = gpu_contiguous(w2_shuffled)
+        conv_op2 = FilterActs(stride=1, partial_sum=1, pad=pad)
+        conv_out_2_shuffled = conv_op2(contiguous_activ_1_out, contiguous_w2)
+        conv_out_2 = conv_out_2_shuffled.dimshuffle(3, 0, 1, 2) # c01b to bc01
+        self.output = activation(conv_out_2+self.b2.dimshuffle('x', 0, 'x', 'x')+input)
+
+        stride = 1# not used
+        assert (image_shape[2]-filter_shape[2]+2*pad)%stride==0
+        output_im_size = (image_shape[2]-filter_shape[2]+2*pad)/stride+1
+        self.output_shape = [image_shape[0],
+                            filter_shape[0],
+                            output_im_size,
+                            output_im_size]
+                            
+        # store parameters of this layer
+        self.params = [self.W1, self.b1, self.W2, self.b2]
+
+    def getOutputShape(self):
+        return self.output_shape
+    
+    def load_params(self, W1, b1, W2, b2):
+        self.W1.set_value(W1)
+        self.b1.set_value(b1)
+        self.W2.set_value(W2)
+        self.b2.set_value(b2)
+
+        print 'Residual Layer parameters loaded'
+    def hasParams(self):
+        return True
+    def nParams(self):
+        return 4
+
 class LeNetConvPoolLayer(object):
     """Pool Layer of a convolutional network """
 
     def __init__(self, rng, input, filter_shape, image_shape,
                  pad = 0, poolsize=(2, 2), activation = T.tanh, poolstride=(2, 2),
-                 init_type="tanh", conv_mode='conv',
+                 init_type="tanh",
                  W=None, b=None):
         """
         Allocate a LeNetConvPoolLayer with shared variable internal parameters.
@@ -598,25 +596,47 @@ class LeNetConvPoolLayer(object):
 		),
 		borrow=True
 	    )
-        if not W is None:
+        if W!=None:
             self.W.set_value(W)
 
 	# the bias is a 1D tensor -- one bias per output feature map
 	b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
 	self.b = theano.shared(value=b_values, borrow=True)
-        if not b is None:
-            self.b.set_value(b)            
+        if b!=None:
+            self.b.set_value(b)
+            
+        # convolve input feature maps with filters
+        #conv_out = conv.conv2d(
+        #    input=input,
+        #    filters=self.W,
+        #    filter_shape=filter_shape,
+        #    image_shape=image_shape,
+        #    border_mode='full'
+        #)
+        input_shuffled = input.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        filters_shuffled = self.W.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        conv_op = FilterActs(stride=1, partial_sum=1, pad=pad)
+        contiguous_input = gpu_contiguous(input_shuffled)
+        contiguous_filters = gpu_contiguous(filters_shuffled)
+        conv_out_shuffled = conv_op(contiguous_input, contiguous_filters)
 
-        # cuDNN implementation
-        conv_out = dnn_conv(input, self.W,
-                            border_mode=pad, conv_mode=conv_mode)
-        pooled_out = dnn_pool(conv_out, poolsize,
-                            stride=poolstride)
-        
+        # downsample each feature map individually, using maxpooling
+        #pooled_out = downsample.max_pool_2d(
+        #    input=conv_out,
+        #    ds=poolsize,
+        #    st=poolstride,
+        #    ignore_border=False
+        #)
+        pool_op = MaxPool(ds=poolsize[0], stride=poolstride[0])
+        pooled_out_shuffled = pool_op(conv_out_shuffled)
+        pooled_out = pooled_out_shuffled.dimshuffle(3, 0, 1, 2) # c01b to bc01
+    
         # add the bias term. Since the bias is a vector (1D array), we first
         # reshape it to a tensor of shape (1, n_filters, 1, 1). Each bias will
         # thus be broadcasted across mini-batches and feature map
         # width & height
+        #self.output = T.tanh(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
+        #self.output = relu(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
         self.output = activation(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
 
         stride = 1# not used
@@ -644,156 +664,155 @@ class LeNetConvPoolLayer(object):
     def nParams(self):
         return 2
 	
-#class ConvPool2Layer(object):
-#    """Pool Layer of a convolutional network """
-#
-#    def __init__(self, rng, input, filter_shape, image_shape,
-#                 pad = 0, poolsize=(2, 2), activation = T.tanh, poolstride=(2, 2),
-#                 init_type="tanh",
-#                 W=None, b=None):
-#        """
-#        Allocate a LeNetConvPoolLayer with shared variable internal parameters.
-#
-#        :type rng: numpy.random.RandomState
-#        :param rng: a random number generator used to initialize weights
-#
-#        :type input: theano.tensor.dtensor4
-#        :param input: symbolic image tensor, of shape image_shape
-#
-#        :type filter_shape: tuple or list of length 4
-#        :param filter_shape: (number of filters, num input feature maps,
-#                              filter height, filter width)
-#
-#        :type image_shape: tuple or list of length 4
-#        :param image_shape: (batch size, num input feature maps,
-#                             image height, image width)
-#
-#        :type poolsize: tuple or list of length 2
-#        :param poolsize: the downsampling (pooling) factor (#rows, #cols)
-#        """
-#
-#        assert image_shape[1] == filter_shape[1]
-#        self.input = input
-#
-#	# there are "num input feature maps * filter height * filter width"
-#	# inputs to each hidden unit
-#	fan_in = numpy.prod(filter_shape[1:])
-#	# each unit in the lower layer receives a gradient from:
-#	# "num output feature maps * filter height * filter width" /
-#	#   pooling size
-#	
-#	if init_type=="ReLU":
-#	    print "ConvPoolLayer with He init"
-#	    std = numpy.sqrt(2.0/fan_in)
-#	    self.W = theano.shared(
-#		numpy.asarray(
-#		    rng.normal(0, std, size=filter_shape),
-#		    dtype=theano.config.floatX
-#		),
-#		borrow=True
-#	    )
-#	else:
-#	    print "ConvPoolLayer with Xavier init"
-#	    fan_out = (filter_shape[0] * numpy.prod(filter_shape[2:]) /
-#		       numpy.prod(poolsize))
-#	    # initialize weights with random weights
-#	    W_bound = numpy.sqrt(6. / (fan_in + fan_out))    
-#	    self.W = theano.shared(
-#		numpy.asarray(
-#		    rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
-#		    dtype=theano.config.floatX
-#		),
-#		borrow=True
-#	    )
-#        if not W is None:
-#            self.W.set_value(W)
-#
-#	# the bias is a 1D tensor -- one bias per output feature map
-#	b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
-#	self.b = theano.shared(value=b_values, borrow=True)
-#        if not b is None:
-#            self.b.set_value(b)
-#            
-#        # convolve input feature maps with filters
-#        #conv_out = conv.conv2d(
-#        #    input=input,
-#        #    filters=self.W,
-#        #    filter_shape=filter_shape,
-#        #    image_shape=image_shape,
-#        #    border_mode='full'
-#        #)
-#        #input_shuffled = input.dimshuffle(1, 2, 3, 0) # bc01 to c01b
-#        #filters_shuffled = self.W.dimshuffle(1, 2, 3, 0) # bc01 to c01b
-#        #conv_op = FilterActs(stride=1, partial_sum=1, pad=pad)
-#        #contiguous_input = gpu_contiguous(input_shuffled)
-#        #contiguous_filters = gpu_contiguous(filters_shuffled)
-#        #conv_out_shuffled = conv_op(contiguous_input, contiguous_filters)
-#	
-#	conv_out = T.nnet.conv2d(input, self.W, border_mode=pad, filter_flip=False) 
-#
-#        # downsample each feature map individually, using maxpooling
-#        pooled_out = downsample.max_pool_2d(
-#            input=conv_out,
-#            ds=poolsize,
-#            st=poolstride,
-#            ignore_border=False
-#        )
-#        #pool_op = MaxPool(ds=poolsize[0], stride=poolstride[0])
-#        #pooled_out_shuffled = pool_op(conv_out_shuffled)
-#        #pooled_out = pooled_out_shuffled.dimshuffle(3, 0, 1, 2) # c01b to bc01
-#    
-#	
-#    
-#        # add the bias term. Since the bias is a vector (1D array), we first
-#        # reshape it to a tensor of shape (1, n_filters, 1, 1). Each bias will
-#        # thus be broadcasted across mini-batches and feature map
-#        # width & height
-#        #self.output = T.tanh(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
-#        #self.output = relu(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
-#        self.output = activation(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
-#
-#        stride = 1# not used
-#        assert (image_shape[2]-filter_shape[2]+2*pad)%stride==0
-#        output_im_size = (image_shape[2]-filter_shape[2]+2*pad)/stride+1
-#        assert output_im_size%poolsize[0]==0
-#        output_im_size = output_im_size//poolsize[0]
-#        self.output_shape = [image_shape[0],
-#                            filter_shape[0],
-#                            output_im_size,
-#                            output_im_size]
-#                            
-#        # store parameters of this layer
-#        self.params = [self.W, self.b]
-#
-#    def getOutputShape(self):
-#        return self.output_shape
-#    
-#    def load_params(self, W, b):
-#        self.W.set_value(W)
-#        self.b.set_value(b)
-#        print 'Convolutional Layer parameters loaded'
-#    def hasParams(self):
-#        return True
-#    def nParams(self):
-#        return 2
+class ConvPool2Layer(object):
+    """Pool Layer of a convolutional network """
+
+    def __init__(self, rng, input, filter_shape, image_shape,
+                 pad = 0, poolsize=(2, 2), activation = T.tanh, poolstride=(2, 2),
+                 init_type="tanh",
+                 W=None, b=None):
+        """
+        Allocate a LeNetConvPoolLayer with shared variable internal parameters.
+
+        :type rng: numpy.random.RandomState
+        :param rng: a random number generator used to initialize weights
+
+        :type input: theano.tensor.dtensor4
+        :param input: symbolic image tensor, of shape image_shape
+
+        :type filter_shape: tuple or list of length 4
+        :param filter_shape: (number of filters, num input feature maps,
+                              filter height, filter width)
+
+        :type image_shape: tuple or list of length 4
+        :param image_shape: (batch size, num input feature maps,
+                             image height, image width)
+
+        :type poolsize: tuple or list of length 2
+        :param poolsize: the downsampling (pooling) factor (#rows, #cols)
+        """
+
+        assert image_shape[1] == filter_shape[1]
+        self.input = input
+
+	# there are "num input feature maps * filter height * filter width"
+	# inputs to each hidden unit
+	fan_in = numpy.prod(filter_shape[1:])
+	# each unit in the lower layer receives a gradient from:
+	# "num output feature maps * filter height * filter width" /
+	#   pooling size
+	
+	if init_type=="ReLU":
+	    print "ConvPoolLayer with He init"
+	    std = numpy.sqrt(2.0/fan_in)
+	    self.W = theano.shared(
+		numpy.asarray(
+		    rng.normal(0, std, size=filter_shape),
+		    dtype=theano.config.floatX
+		),
+		borrow=True
+	    )
+	else:
+	    print "ConvPoolLayer with Xavier init"
+	    fan_out = (filter_shape[0] * numpy.prod(filter_shape[2:]) /
+		       numpy.prod(poolsize))
+	    # initialize weights with random weights
+	    W_bound = numpy.sqrt(6. / (fan_in + fan_out))    
+	    self.W = theano.shared(
+		numpy.asarray(
+		    rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
+		    dtype=theano.config.floatX
+		),
+		borrow=True
+	    )
+        if W!=None:
+            self.W.set_value(W)
+
+	# the bias is a 1D tensor -- one bias per output feature map
+	b_values = numpy.zeros((filter_shape[0],), dtype=theano.config.floatX)
+	self.b = theano.shared(value=b_values, borrow=True)
+        if b!=None:
+            self.b.set_value(b)
+            
+        # convolve input feature maps with filters
+        #conv_out = conv.conv2d(
+        #    input=input,
+        #    filters=self.W,
+        #    filter_shape=filter_shape,
+        #    image_shape=image_shape,
+        #    border_mode='full'
+        #)
+        #input_shuffled = input.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        #filters_shuffled = self.W.dimshuffle(1, 2, 3, 0) # bc01 to c01b
+        #conv_op = FilterActs(stride=1, partial_sum=1, pad=pad)
+        #contiguous_input = gpu_contiguous(input_shuffled)
+        #contiguous_filters = gpu_contiguous(filters_shuffled)
+        #conv_out_shuffled = conv_op(contiguous_input, contiguous_filters)
+	
+	conv_out = T.nnet.conv2d(input, self.W, border_mode=pad, filter_flip=False) 
+
+        # downsample each feature map individually, using maxpooling
+        pooled_out = downsample.max_pool_2d(
+            input=conv_out,
+            ds=poolsize,
+            st=poolstride,
+            ignore_border=False
+        )
+        #pool_op = MaxPool(ds=poolsize[0], stride=poolstride[0])
+        #pooled_out_shuffled = pool_op(conv_out_shuffled)
+        #pooled_out = pooled_out_shuffled.dimshuffle(3, 0, 1, 2) # c01b to bc01
+    
+	
+    
+        # add the bias term. Since the bias is a vector (1D array), we first
+        # reshape it to a tensor of shape (1, n_filters, 1, 1). Each bias will
+        # thus be broadcasted across mini-batches and feature map
+        # width & height
+        #self.output = T.tanh(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
+        #self.output = relu(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
+        self.output = activation(pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
+
+        stride = 1# not used
+        assert (image_shape[2]-filter_shape[2]+2*pad)%stride==0
+        output_im_size = (image_shape[2]-filter_shape[2]+2*pad)/stride+1
+        assert output_im_size%poolsize[0]==0
+        output_im_size = output_im_size//poolsize[0]
+        self.output_shape = [image_shape[0],
+                            filter_shape[0],
+                            output_im_size,
+                            output_im_size]
+                            
+        # store parameters of this layer
+        self.params = [self.W, self.b]
+
+    def getOutputShape(self):
+        return self.output_shape
+    
+    def load_params(self, W, b):
+        self.W.set_value(W)
+        self.b.set_value(b)
+        print 'Convolutional Layer parameters loaded'
+    def hasParams(self):
+        return True
+    def nParams(self):
+        return 2
 
 
-#class MaxPoolingLayer():
-#    ## TODO: Use dnn_pool as pooling method
-#    def __init__(self, input, image_shape, size=2, stride=2):
-#        assert (image_shape[2]-size)%stride==0
-#        self.output_shape = image_shape
-#        output_im_size = (image_shape[2]-size)/stride+1
-#        self.output_shape[2] = output_im_size
-#        self.output_shape[3] = output_im_size
-#
-#        pool_op = MaxPool(ds=size, stride=stride)
-#        input_shuffled = input.dimshuffle(1,2,3,0)
-#        pool_out = pool_op(input_shuffled)
-#        self.output = pool_out.dimshuffle(3,0,1,2)
-#    def getOutputShape(self):
-#        return self.output_shape
-#    def hasParams(self):
-#        return False
-#    def nParams(self):
-#        return 0
+class MaxPoolingLayer():
+    def __init__(self, input, image_shape, size=2, stride=2):
+        assert (image_shape[2]-size)%stride==0
+        self.output_shape = image_shape
+        output_im_size = (image_shape[2]-size)/stride+1
+        self.output_shape[2] = output_im_size
+        self.output_shape[3] = output_im_size
+
+        pool_op = MaxPool(ds=size, stride=stride)
+        input_shuffled = input.dimshuffle(1,2,3,0)
+        pool_out = pool_op(input_shuffled)
+        self.output = pool_out.dimshuffle(3,0,1,2)
+    def getOutputShape(self):
+        return self.output_shape
+    def hasParams(self):
+        return False
+    def nParams(self):
+        return 0

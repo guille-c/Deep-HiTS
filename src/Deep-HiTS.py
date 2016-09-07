@@ -153,8 +153,10 @@ if __name__ == '__main__':
         activation = T.tanh
     elif c.get("vars", "activation_function") == "ReLU":
         activation = relu
+    elif c.get("vars", "activation_function") == "leaky_relu":
+        activation = leaky_relu
     elif c.get("vars", "activation_function") == "PReLU":
-        activation = prelu
+        raise Exception("PReLU was renamed as leaky_relu.")
 
     tiny_train = c.get("vars", "tiny_train")
     if tiny_train == "False":

@@ -166,7 +166,7 @@ class ArchBuilder():
 
 class ConvNet():
     def __init__(self, batch_size=100,
-                 activation=prelu, params=[None]*100):
+                 activation=leaky_relu, params=[None]*100):
         rng = numpy.random.RandomState(23455)
         self.batch_size = batch_size
         im_chan = 4

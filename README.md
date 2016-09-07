@@ -30,7 +30,7 @@ N_train = 1220000
 N_valid = 100000
 N_test = 100000
 validate_every_batches = 5000
-activation_function: PReLU
+activation_function: leaky_relu
 tiny_train: False
 resume: None
 savestep: 25000
@@ -51,7 +51,7 @@ data_interface: directory
 - `N_valid`: Number of instances used for validating.
 - `N_test`: Number of instances used for testing.
 - `validate_every_batches`: number of batches per calculation of errors on the validation set.
-- `activation_function`: activation function. Currently supports `tanh`(hyperbolic tangent), `ReLU`(rectified linear units), and `PReLU` (leaky ReLU).
+- `activation_function`: activation function. Currently supports `tanh`(hyperbolic tangent), `ReLU`(rectified linear units), and `leaky_relu` (leaky ReLU).
 - `tiny_train`: Always False on the meantime.
 - `resume`: prefix of files for resumming the network from a previous model. This is useful in case a previous training crashes, which we can restart from a saved intermediate state. If `None`, network starts training from scratch.
 - `savestep`: Number of steps every which the network will be saved.

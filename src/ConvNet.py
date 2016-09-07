@@ -104,17 +104,22 @@ class ConvNet():
         self.cost = self.layers[-1].negative_log_likelihood(self.y)
         theano.printing.pydotprint(self.cost, outfile="./arch_graph.png", var_with_name_simple=True)
         self.learning_rate = base_lr
+        
         self.train_model = theano.function(
             [self.index, self.lr],
             self.cost,
             updates=gradient_updates_momentum(self.cost, self.params, self.lr, momentum),
             givens={
-                self.x: self.train_set_x[self.index * batch_size: (self.index + 1) * batch_size],
-                self.y: self.train_set_y[self.index * batch_size: (self.index + 1) * batch_size]
+                self.y: self.train_set_y[self.index * batch_size: (self.index + 1) * batch_size],
+                self.x: self.train_set_x[self.index * batch_size: (self.index + 1) * batch_size]
             }#, mode="DebugMode"
         )
         print 'train_model was compiled'
-        theano.printing.pydotprint(self.train_model, outfile="./reduced_arch_graph.png", var_with_name_simple=True)
+
+        ### Draw optimized model ###
+        #theano.printing.pydotprint(self.train_model, outfile="./reduced_arch_graph.png", var_with_name_simple=True)
+        ### It takes about 1 minute to finish
+        
         self.validate_model = theano.function(
             [self.index],
             self.layers[-1].errors(self.y),

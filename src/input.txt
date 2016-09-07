@@ -11,7 +11,7 @@ batch_size: 50
 N_valid = 100000
 N_test = 100000
 validate_every_batches = 10000
-activation_function: PReLU
+activation_function: leaky_relu
 tiny_train: False
 resume: None
 savestep: 25000
