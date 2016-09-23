@@ -128,7 +128,7 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                 patience = convnet.validate(patience)
             t = time.time()
             convnet.train()
-            print " training time = ", time.time() - t
+            #print " training time = ", time.time() - t
             epoch_done = convnet.dataInterface.doneTrain ()
             if patience <= convnet.it:
                 done_looping = True

@@ -151,7 +151,8 @@ class LogisticRegression(object):
         # LP[n-1,y[n-1]]] and T.mean(LP[T.arange(y.shape[0]),y]) is
         # the mean (across minibatch examples) of the elements in v,
         # i.e., the mean log-likelihood across the minibatch.
-        return -T.mean(T.log(self.p_y_given_x)[T.arange(y.shape[0]), y])
+        return -T.mean(T.log(self.p_y_given_x)[T.arange(y.shape[0]), y],
+                       dtype=theano.config.floatX)
         # end-snippet-2
 
     def errors(self, y):
@@ -175,7 +176,7 @@ class LogisticRegression(object):
         if y.dtype.startswith('int'):
             # the T.neq operator returns a vector of 0s and 1s, where 1
             # represents a mistake in prediction
-            return T.mean(T.neq(self.y_pred, y))
+            return T.mean(T.neq(self.y_pred, y), dtype=theano.config.floatX)
         else:
             raise NotImplementedError()
 
@@ -206,7 +207,8 @@ class LogisticRegression(object):
             N = T.eq(y, zeros)
             P = T.eq(y, ones)
             FN = T.and_(P, T.eq(zeros, self.y_pred))
-            return T.mean(FN)/T.mean(P)
+            return T.mean(FN, dtype=theano.config.floatX)/T.mean(P,
+                                                                 dtype=theano.config.floatX)
         else:
             raise NotImplementedError()
 
@@ -235,7 +237,8 @@ class LogisticRegression(object):
             N = T.eq(y, zeros)
             P = T.eq(y, ones)
             FP = T.and_(N, T.eq(ones, self.y_pred))
-            return T.mean(FP)/T.mean(N)
+            return T.mean(FP, dtype=theano.config.floatX)/T.mean(N,
+                                                                 dtype=theano.config.floatX)
         else:
             raise NotImplementedError()
     def load_params(self, W, b):
@@ -308,6 +311,7 @@ class HiddenLayer(object):
                            layer
         """
         self.input = input
+        
         # end-snippet-1
 
         # `W` is initialized with `W_values` which is uniformely sampled
@@ -330,7 +334,8 @@ class HiddenLayer(object):
 		    0,
 		    numpy.sqrt(2.0/n_in),
 		    size=(n_in, n_out)
-		)
+		),
+                dtype=theano.config.floatX
 	    )
 	else:
 	    print "HiddenLayer with Xavier init"
@@ -355,6 +360,11 @@ class HiddenLayer(object):
 	    self.b.set_value(b)
 	
         lin_output = T.dot(input, self.W) + self.b
+
+        print 'hiddenlayer/lin_output dtypes (input, W, b, out)', input.dtype, self.W.dtype,
+        print self.b.dtype, lin_output.dtype, 
+
+
         self.output = (
             lin_output if activation is None
             else activation(lin_output)
