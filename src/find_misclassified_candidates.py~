@@ -1,0 +1,9 @@
+"""
+Call it as:
+
+python2 find_misclassified_candidates.py arch7.py final_convnet_state.pkl /folder/with/chunks
+
+import sys
+
+from DeepDetector import *
+

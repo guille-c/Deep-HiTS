@@ -361,10 +361,6 @@ class HiddenLayer(object):
 	
         lin_output = T.dot(input, self.W) + self.b
 
-        print 'hiddenlayer/lin_output dtypes (input, W, b, out)', input.dtype, self.W.dtype,
-        print self.b.dtype, lin_output.dtype, 
-
-
         self.output = (
             lin_output if activation is None
             else activation(lin_output)
