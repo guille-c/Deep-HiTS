@@ -14,4 +14,7 @@ for row in f:
         iters.append(elems[3][:-1])
 
 plt.plot(iters, loss)
+plt.xlabel('Iteration')
+plt.ylabel('loss (cross-entropy)')
+plt.title('Learning curve (validation set)')
 plt.show()

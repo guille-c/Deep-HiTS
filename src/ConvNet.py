@@ -102,19 +102,24 @@ class ConvNet():
         self.layers = self.arch.getLayers()
         self.params = self.arch.getParams()
         self.cost = self.layers[-1].negative_log_likelihood(self.y)
-        theano.printing.pydotprint(self.cost, outfile="./arch_graph.png", var_with_name_simple=True)
+        #theano.printing.pydotprint(self.cost, outfile="./arch_graph.png", var_with_name_simple=True)
         self.learning_rate = base_lr
+        
         self.train_model = theano.function(
             [self.index, self.lr],
             self.cost,
             updates=gradient_updates_momentum(self.cost, self.params, self.lr, momentum),
             givens={
-                self.x: self.train_set_x[self.index * batch_size: (self.index + 1) * batch_size],
-                self.y: self.train_set_y[self.index * batch_size: (self.index + 1) * batch_size]
+                self.y: self.train_set_y[self.index * batch_size: (self.index + 1) * batch_size],
+                self.x: self.train_set_x[self.index * batch_size: (self.index + 1) * batch_size]
             }#, mode="DebugMode"
         )
         print 'train_model was compiled'
-        theano.printing.pydotprint(self.train_model, outfile="./reduced_arch_graph.png", var_with_name_simple=True)
+
+        ### Draw optimized model ###
+        #theano.printing.pydotprint(self.train_model, outfile="./reduced_arch_graph.png", var_with_name_simple=True)
+        ### It takes about 1 minute to finish
+        
         self.validate_model = theano.function(
             [self.index],
             self.layers[-1].errors(self.y),
@@ -429,10 +434,6 @@ def gradient_updates_momentum(cost, params, learning_rate, momentum):
         # This variable will keep track of the parameter's update step across iterations.
         # We initialize it to 0
         param_update = theano.shared(param.get_value()*0., broadcastable=param.broadcastable)
-        # Each parameter is updated by taking a step in the direction of the gradient.
-        # However, we also "mix in" the previous step according to the given momentum value.
-        # Note that when updating param_update, we are using its old value and also the new gradient step.
-        updates.append((param, param - learning_rate*param_update))
-        # Note that we don't need to derive backpropagation to compute updates - just use T.grad!
-        updates.append((param_update, momentum*param_update + (1. - momentum)*T.grad(cost, param)))
+        updates.append((param_update, momentum*param_update + learning_rate*T.grad(cost, param)))
+        updates.append((param, param - param_update))
     return updates        

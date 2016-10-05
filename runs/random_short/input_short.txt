@@ -12,7 +12,7 @@ N_train = 100000
 N_valid = 10000
 N_test = 10000
 validate_every_batches = 1000
-activation_function: PReLU
+activation_function: leaky_relu
 tiny_train: False
 resume: None
 savestep: 25000
