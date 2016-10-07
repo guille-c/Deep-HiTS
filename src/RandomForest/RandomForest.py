@@ -50,42 +50,42 @@ clf = RandomForestClassifier (random_state = 0, n_estimators=100,
                               criterion = 'entropy', max_features = 'auto')
 
 #N_test = 100000
-N_train = np.round(10 **np.arange(1, 5, 0.5)).astype(int)
-print N_train
-i_s = np.arange(len(y_train))
-np.random.shuffle (i_s)
-x = x_train[i_s]
-y = y_train[i_s]
-n_iter = 10
-scores, scores_s = [], []
-for N in N_train:
-    print "starting ", N
-    t1 = time()
-    fn = sharedir + "scores_" + str(N)
-    if os.path.exists (fn + ".npy"):
-        accs = np.load (fn + ".npy")
-    else:
-        sss = StratifiedShuffleSplit(y, n_iter=n_iter, test_size=100000, train_size = N)
-        accs = []
-        for train_index, test_index in sss:
-            clf.fit(x[train_index], y[train_index])
-            y_p = clf.predict (x[test_index])
-            accs.append((y_p == y[test_index]).sum()/100000.)
-    t2 = time()
-    print "  total time = ", t2 - t1
-    np.save(fn, np.array(accs))
-    scores.append (np.mean(accs))
-    scores_s.append (np.std(accs))
-
-plot_acc = True
-if plot_acc:
-    import pylab as pl
-    pl.clf()
-    pl.errorbar (N_train, scores, yerr = scores_s, fmt = "-")
-    pl.xscale("log")
-    pl.xlim ([N_train[0]*0.7, N_train[-1]*2])
-    pl.savefig ("acc_vs_Ntrain")
-    #exit()
+#N_train = np.round(10 **np.arange(1, 5, 0.5)).astype(int)
+#print N_train
+#i_s = np.arange(len(y_train))
+#np.random.shuffle (i_s)
+#x = x_train[i_s]
+#y = y_train[i_s]
+#n_iter = 10
+#scores, scores_s = [], []
+#for N in N_train:
+#    print "starting ", N
+#    t1 = time()
+#    fn = sharedir + "scores_" + str(N)
+#    if os.path.exists (fn + ".npy"):
+#        accs = np.load (fn + ".npy")
+#    else:
+#        sss = StratifiedShuffleSplit(y, n_iter=n_iter, test_size=100000, train_size = N)
+#        accs = []
+#        for train_index, test_index in sss:
+#            clf.fit(x[train_index], y[train_index])
+#            y_p = clf.predict (x[test_index])
+#            accs.append((y_p == y[test_index]).sum()/100000.)
+#    t2 = time()
+#    print "  total time = ", t2 - t1
+#    np.save(fn, np.array(accs))
+#    scores.append (np.mean(accs))
+#    scores_s.append (np.std(accs))
+#
+#plot_acc = True
+#if plot_acc:
+#    import pylab as pl
+#    pl.clf()
+#    pl.errorbar (N_train, scores, yerr = scores_s, fmt = "-")
+#    pl.xscale("log")
+#    pl.xlim ([N_train[0]*0.7, N_train[-1]*2])
+#    pl.savefig ("acc_vs_Ntrain")
+#    #exit()
         
 def trainRandomForest (x, y, x_t, y_t, clf, crit, fn, snrs):
     (att_train, att_test) = x[:, crit], x_t[:, crit]
@@ -95,14 +95,18 @@ def trainRandomForest (x, y, x_t, y_t, clf, crit, fn, snrs):
     clf.fit(att_train, class_train)
     print "model fitted, predicting"
 
-    class_predict = clf.predict_proba(att_test)
-    print "predicted, saving"
+    with open('RF_model.pkl', 'wb') as fid:
+        pickle.dump(clf, fid)
+    print "Random Forest model saved"
+    
+    #class_predict = clf.predict_proba(att_test)
+    #print "predicted, saving"
 
-    with open (fn, "w") as f:
-        pickle.dump({'RF_pbbs': class_predict,
-                     'labels': class_test,
-                     'SNRs': snrs},
-                    f, pickle.HIGHEST_PROTOCOL)
+    #with open (fn, "w") as f:
+    #    pickle.dump({'RF_pbbs': class_predict,
+    #                 'labels': class_test,
+    #                 'SNRs': snrs},
+    #                f, pickle.HIGHEST_PROTOCOL)
 
 # crit = np.ones(scd.attributes.shape[1])
 # trainRandomForest (scd, clf, crit, N_test, "RF_test_predictions_all.pkl")
@@ -119,6 +123,9 @@ def trainRandomForest (x, y, x_t, y_t, clf, crit, fn, snrs):
 #trainRandomForest (scd, clf, crit, N_test, "RF_test_predictions_diff_psf_snr_K_i1_i2.pkl", snrs)
 #crit = diff | psf | snr | K | i1 | i2 | ncand
 #trainRandomForest (scd, clf, crit, N_test, "RF_test_predictions_diff_psf_snr_K_i1_i2_cand.pkl", snrs)
+
+i_s = np.arange(len(y_train))
+
 crit = np.ones(len(diff), dtype = bool)
-trainRandomForest (x_train, y_train, x_test, y_test, clf, crit,
+trainRandomForest (x_train[i_s], y_train[i_s], x_test, y_test, clf, crit,
                    sharedir + "/RF_test_predictions_full.pkl", x_test[:, 2])

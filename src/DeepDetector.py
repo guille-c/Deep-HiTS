@@ -82,10 +82,12 @@ class ConvNet():
 	return prediction
 
 class DeepDetector:
-    def __init__(self, archpy_filename, params_filename, batch_size):
+    def __init__(self, archpy_filename, params_filename, batch_size, activation=leaky_relu):
 	model = np.load(params_filename)
 	params = model['best_params']	
-	self.convnet = ConvNet(archpy_filename, params=params, batch_size=batch_size) # TODO
+	self.convnet = ConvNet(archpy_filename, params=params,
+                               batch_size=batch_size,
+                               activation=activation) # TODO
     
     def predict_sn(self, candidate):
 	return self.convnet.predict_sn(candidate)
