@@ -6,7 +6,8 @@ import numpy as np
 import cPickle as pickle
 
 class ChunkLoader():
-    def __init__(self, folder, n_cand_chunk, batch_size, n_rot = 3):
+    def __init__(self, folder, n_cand_chunk, batch_size, n_rot = 3,
+                 keys = ['temp_images', 'sci_images', 'diff_images', 'SNR_images']):
 	self.files = os.listdir(folder)
         self.files.sort()
 	self.current_file = 0
@@ -18,6 +19,7 @@ class ChunkLoader():
 	self.lastSNRs = []
         self.done = False
         self.n_rot = n_rot
+        self.keys = keys
         
     def normalizeImage(self, im):
 	return 1. * (im - im.min())/(im.max() - im.min())
@@ -39,12 +41,11 @@ class ChunkLoader():
             
     def getNext(self, normalize=True):
 	#print self.current_file, self.batch_i, self.files[self.current_file]
-	keys = ['temp_images', 'sci_images', 'diff_images', 'SNR_images']
 
 	#N = len(train_pkl['labels'])
         self.lastSNRs = self.current_file_data['SNRs'][self.batch_i:self.batch_i+self.batch_size]
 	data = []
-	for k in keys:
+	for k in self.keys:
 	    temp = self.current_file_data[k][self.batch_i:self.batch_i+self.batch_size]
 	    if normalize:
 	        temp = self.normalizeSet(temp)

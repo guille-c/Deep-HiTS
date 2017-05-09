@@ -7,7 +7,8 @@ class RandomDataInterface (ChunkDataInterface):
     def __init__ (self, folder,
                   n_cand_chunk = 50000, batch_size = 50,
                   N_valid = 100000, N_test = 100000, N_train = 1250000,
-                  im_chan = 4, im_size = 21):
+                  im_chan = 4, im_size = 21,
+                  im_keys = ['temp_images', 'sci_images', 'diff_images', 'SNR_images']):
         self.folder = folder
         self.n_cand_chunk = n_cand_chunk
         self.batch_size = batch_size
@@ -16,7 +17,8 @@ class RandomDataInterface (ChunkDataInterface):
         self.N_train = N_train
         self.im_chan = im_chan
         self.im_size = im_size
-
+        self.keys = im_keys
+        
 	self.files = os.listdir(folder)
         self.files.sort()
         self.files = np.array(self.files)
@@ -63,7 +65,7 @@ class RandomDataInterface (ChunkDataInterface):
         print files_set
         print i_file, cand_count
         return ListChunkLoader (self.folder, files_set, self.n_cand_chunk,
-                                self.batch_size, n_rot = 0), i_file
+                                self.batch_size, n_rot = 0, keys = self.keys), i_file
 
 
 if __name__=="__main__":

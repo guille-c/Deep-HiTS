@@ -27,8 +27,9 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                      tiny_train = False, buf_size=1000, savestep=50000,
                      resume = None, improve_thresh = 0.99, ini_patience = 50000,
                      data_interface_str = "directory",
-                     im_chan = 4, im_size = 21):
-
+                     im_size = 21,
+                     keys = ['temp_images', 'sci_images', 'diff_images', 'SNR_images']):
+    im_chan = len(keys)
     if data_interface_str == "directory":
         print "cnn.py: creating dataInterface"
         train_folder = data_path+'/chunks_train/'
@@ -41,7 +42,8 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                                                N_test = N_test,
                                                N_train = N_train,
                                                im_chan = im_chan,
-                                               im_size = im_size)
+                                               im_size = im_size,
+                                               im_keys = keys)
         print "cnn.py: dataInterface created"
     elif data_interface_str == "random":
         dataInterface = RandomDataInterface (data_path, 
@@ -51,7 +53,8 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                                              N_test = N_test,
                                              N_train = N_train,
                                              im_chan = im_chan,
-                                             im_size = im_size)
+                                             im_size = im_size,
+                                             im_keys = keys)
     else:
         print "cnn.py: " + data_interface_str + " not implemented."
         exit()
@@ -61,7 +64,7 @@ def evaluate_convnet(arch_def, data_path, n_cand_chunk,
                       base_lr=base_lr, momentum=momentum,
                       activation=activation,
                       buf_size=buf_size, n_cand_chunk=n_cand_chunk, n_rot=n_rot,
-                      N_valid=N_valid, N_test=N_test)
+                      N_valid=N_valid, N_test=N_test, im_chan = im_chan)
     print "ConvNet created"
     
     patience = ini_patience
@@ -174,7 +177,8 @@ if __name__ == '__main__':
     imp.load_source ("archpy", c.get("vars", "arch_py"))
     import archpy
 
-    evaluate_convnet(archpy.convNetArchitecture(4, int (c.get("vars", "batch_size")),
+    evaluate_convnet(archpy.convNetArchitecture(len(c.get("vars", "im_keys").split()),
+                                                int (c.get("vars", "batch_size")),
                                                 21, activation),
                      c.get("vars", "path_to_chunks"),
                      int(c.get("vars", "n_cand_chunk")),
@@ -198,5 +202,6 @@ if __name__ == '__main__':
                      resume = resume,
                      improve_thresh = float (c.get("vars", "improvement_threshold")),
                      ini_patience = int (c.get("vars", "ini_patience")),
-                     data_interface_str = c.get("vars", "data_interface")
+                     data_interface_str = c.get("vars", "data_interface"),
+                     keys = c.get("vars", "im_keys").split()
     )

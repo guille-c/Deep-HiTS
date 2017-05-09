@@ -8,6 +8,7 @@ stepsize: 100000
 momentum: 0.0
 n_epochs: 1
 batch_size: 50
+N_train = 100000
 N_valid = 100000
 N_test = 100000
 validate_every_batches = 10000
@@ -17,3 +18,4 @@ resume: None
 savestep: 25000
 improvement_threshold: 0.2
 ini_patience = 300
+im_keys: temp_images sci_images diff_images SNR_images

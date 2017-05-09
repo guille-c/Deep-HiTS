@@ -8,7 +8,8 @@ class DirectoryDataInterface (ChunkDataInterface):
     def __init__ (self, train_folder, valid_folder, test_folder,
                   n_cand_chunk = 50000, batch_size = 50,
                   N_valid = 100000, N_test = 100000, N_train = 1250000,
-                  im_chan = 4, im_size = 21):
+                  im_chan = 4, im_size = 21,
+                  im_keys = ['temp_images', 'sci_images', 'diff_images', 'SNR_images']):
         self.n_cand_chunk = n_cand_chunk
         self.batch_size = batch_size
         self.N_valid = N_valid
@@ -19,14 +20,14 @@ class DirectoryDataInterface (ChunkDataInterface):
 
         print "DirectoryDataInterface: creating chunkLoaderTrain"
         self.chunkLoaderTrain = ChunkLoader(train_folder, self.n_cand_chunk,
-                                            self.batch_size, n_rot = 0)
+                                            self.batch_size, n_rot = 0, keys = im_keys)
         print "DirectoryDataInterface: chunkLoaderTrain created"
         print "DirectoryDataInterface: creating chunkLoaderValidation"
         self.chunkLoaderValidation = ChunkLoader(valid_folder, self.n_cand_chunk,
-                                            self.batch_size, n_rot = 0)
+                                            self.batch_size, n_rot = 0, keys = im_keys)
         print "DirectoryDataInterface: chunkLoaderValidation created"
         print "DirectoryDataInterface: creating chunkLoaderTest"                
         self.chunkLoaderTest = ChunkLoader(test_folder, self.n_cand_chunk,
-                                            self.batch_size, n_rot = 0)
+                                            self.batch_size, n_rot = 0, keys = im_keys)
         print "DirectoryDataInterface: chunkLoaderTest created"
 

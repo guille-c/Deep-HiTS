@@ -230,12 +230,12 @@ class ConvNet():
         self.train_err_history.append(train_minibatch_error)
         self.iter_train_history.append(self.it)
 
-        # alert if train error is too high
-        if train_minibatch_error > 0.1:
-            print "--> train minibatch error = ", train_minibatch_error, " at iter ", self.it
-            print "--> ", self.dataInterface.chunkLoaderTrain.current_file, \
-                self.dataInterface.chunkLoaderTrain.batch_i, \
-                self.dataInterface.chunkLoaderTrain.files[self.dataInterface.chunkLoaderTrain.current_file]
+        # # alert if train error is too high
+        # if train_minibatch_error > 0.1:
+        #     print "--> train minibatch error = ", train_minibatch_error, " at iter ", self.it
+        #     print "--> ", self.dataInterface.chunkLoaderTrain.current_file, \
+        #         self.dataInterface.chunkLoaderTrain.batch_i, \
+        #         self.dataInterface.chunkLoaderTrain.files[self.dataInterface.chunkLoaderTrain.current_file]
 
         self.it+=1
 
